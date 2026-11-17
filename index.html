@@ -35,26 +35,91 @@
     }
     .vip-btn-glow { animation: vipPulse 2.2s infinite ease-in-out; }
 
-    /* 전체화면 모드: 위쪽은 게임 화면, 아래쪽은 게임 화면을 가리지 않는 전용 조종 영역으로 분리 */
-    #gameAreaSection:fullscreen {
-      width: 100vw !important;
-      height: 100dvh !important;
-      border-radius: 0 !important;
-      border: none !important;
+    /* 평소에는 게임 영역과 기존 조작 패드가 원래 위치에 참여한다. */
+    #fullscreenStage { display: contents; }
+
+    /* 전체화면에서는 게임 영역과 조작 패드를 꽉 차게 배치하되 화면을 가리지 않도록 flex 수직 배치 적용 */
+    #fullscreenStage:fullscreen {
       display: flex !important;
       flex-direction: column !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      position: fixed !important;
+      inset: 0 !important;
+      border-radius: 0 !important;
+      border: none !important;
       background: #020617 !important;
+      overflow: hidden !important;
     }
-    #gameAreaSection:fullscreen #canvasWrapper {
-      flex: 1 1 auto !important;
+
+    #fullscreenStage:fullscreen #gameAreaSection {
+      flex: 1 !important;
+      width: 100% !important;
+      height: auto !important;
+      max-width: none !important;
+      max-height: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+    }
+
+    #fullscreenStage:fullscreen #canvasWrapper {
+      width: 100% !important;
+      height: 100% !important;
       min-height: 0 !important;
       aspect-ratio: auto !important;
       max-height: none !important;
-      height: auto !important;
     }
-    #gameAreaSection:fullscreen #fsControlDock {
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] {
       display: flex !important;
-      flex: 0 0 auto !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      z-index: 30 !important;
+      flex: none !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      background: rgba(15, 23, 42, 0.92) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border-top: 1px solid rgba(51, 65, 85, 0.8) !important;
+    }
+
+    /* 휴대폰 가로 회전: 고정 폭/높이로 인한 좌우 분할과 가로 스크롤 방지 */
+    @media (orientation: landscape) {
+      html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      #fullscreenStage:fullscreen {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        max-width: none !important;
+        max-height: none !important;
+        overflow: hidden !important;
+      }
+
+      #fullscreenStage:fullscreen #canvasWrapper {
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        max-width: none !important;
+        max-height: none !important;
+      }
+
+      #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] {
+        padding: 6px 12px !important;
+        gap: 8px !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+      }
     }
   </style>
 </head>
@@ -124,28 +189,19 @@
 
   <!-- Main Content -->
   <main class="flex-1 max-w-5xl w-full mx-auto px-2.5 sm:px-4 py-3 sm:py-4 flex flex-col gap-3">
-    <!-- 상단 전투 HUD 카드 -->
-    <section class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-      <div class="sm:col-span-2 bg-slate-900/90 border border-amber-500/35 rounded-xl px-3.5 py-2 flex items-center justify-between">
-        <div>
-          <div class="text-[10px] text-amber-300/90 font-bold">🛸 현재 점수 · 구역</div>
-          <div class="flex items-baseline gap-2">
-            <span id="scoreDisplay" class="text-base sm:text-lg font-black text-amber-400 tabular-nums">0</span>
-            <span id="waveDisplay" class="text-xs font-extrabold text-emerald-300">STAGE 1 · 학교 교실</span>
-          </div>
-        </div>
-        <button id="startActionBtn" type="button" class="px-3.5 py-2 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 cursor-pointer active:scale-95 transition shadow">
-          작전 개시
-        </button>
+    <!-- 상단 작전 개시 버튼 바 (현재 점수 및 장착 무기 영역 제거됨) -->
+    <section class="bg-slate-900/90 border border-amber-500/35 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
+      <div>
+        <div class="text-[10px] text-amber-300/90 font-bold">🛸 외계인 침공 2D 액션</div>
+        <div id="waveDisplay" class="text-xs sm:text-sm font-extrabold text-emerald-300 mt-0.5">STAGE 1 · 학교 교실</div>
       </div>
-
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3.5 py-2 flex items-center justify-between sm:flex-col sm:items-start sm:justify-center">
-        <div class="text-[10px] text-slate-400">장착 무기</div>
-        <div id="weaponDisplay" class="text-xs sm:text-sm font-black text-amber-300 truncate mt-0.5">🔫 헤비 머신건</div>
-      </div>
+      <button id="startActionBtn" type="button" class="px-4 py-2 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 cursor-pointer active:scale-95 transition shadow">
+        작전 개시
+      </button>
     </section>
 
-    <!-- 게임 캔버스 영역 (전체화면 진입 시 하단에 전용 조종 영역 자동 도킹) -->
+    <div id="fullscreenStage">
+    <!-- 게임 캔버스 영역 (전체화면 진입 시 기존 조작 패드가 하단에 오버레이) -->
     <section id="gameAreaSection" class="relative bg-slate-950 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-black/60">
       <div id="canvasWrapper" class="relative w-full aspect-[4/3] sm:aspect-[16/9] min-h-[340px] max-h-[620px] bg-slate-900 cursor-crosshair">
         <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
@@ -169,57 +225,6 @@
         </div>
       </div>
 
-      <!-- 전체화면 전용 하단 조종 화면 (게임 화면을 가리지 않도록 캔버스 아래쪽에 독립 배치) -->
-      <div id="fsControlDock" aria-label="전체화면 전용 조작 패드"
-        class="hidden w-full bg-slate-900 border-t border-slate-800 px-4 sm:px-8 py-2.5 sm:py-3 items-center justify-between gap-4 select-none z-20">
-        <!-- 좌측: 전체화면 전용 조이스틱 -->
-        <div class="flex items-center gap-3 shrink-0">
-          <div id="fsStickZone" style="touch-action:none"
-            class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-950 border-2 border-sky-500/60 shadow-inner flex items-center justify-center cursor-pointer">
-            <div class="absolute inset-1.5 rounded-full border border-dashed border-slate-700/80 pointer-events-none"></div>
-            <span class="absolute top-1 left-1/2 -translate-x-1/2 text-[9px] font-black text-sky-400/80 pointer-events-none">▲</span>
-            <span class="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-black text-slate-400/80 pointer-events-none">▼</span>
-            <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 pointer-events-none">◀</span>
-            <span class="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 pointer-events-none">▶</span>
-            <div id="fsStickKnob"
-              class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-xs font-black text-slate-950">
-              🕹️
-            </div>
-          </div>
-        </div>
-
-        <!-- 중앙: 무기 4종 빠른 전환 -->
-        <div class="flex flex-col items-center gap-1.5 flex-1 max-w-xs">
-          <div class="grid grid-cols-4 gap-1.5 w-full">
-            <button type="button" data-weapon="0" title="헤비 머신건" class="weapon-slot-btn rounded-xl py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
-              <div class="text-base sm:text-lg leading-none">🔫</div>
-            </button>
-            <button type="button" data-weapon="1" title="로켓 런처" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-              <div class="text-base sm:text-lg leading-none">💣</div>
-            </button>
-            <button type="button" data-weapon="2" title="레이저 건" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-              <div class="text-base sm:text-lg leading-none">⚡</div>
-            </button>
-            <button type="button" data-weapon="3" title="플레임 샷" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-              <div class="text-base sm:text-lg leading-none">🔥</div>
-            </button>
-          </div>
-          <div class="text-[10px] font-bold text-slate-400">이동 · 점프 · 무기 전환</div>
-        </div>
-
-        <!-- 우측: 대시 + 미사일(발사) 버튼 -->
-        <div class="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-          <button id="fsDashBtn" type="button" style="touch-action:none"
-            class="px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-amber-400/60 text-xs sm:text-sm font-black text-amber-300 shadow cursor-pointer transition">
-            ⚡ 대시
-          </button>
-          <button id="fsMissileBtn" type="button" style="touch-action:none"
-            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-orange-400 via-rose-500 to-red-600 hover:from-orange-300 hover:to-red-500 active:scale-95 border-2 border-amber-200/90 shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center text-white cursor-pointer transition shrink-0">
-            <span class="text-xl sm:text-2xl leading-none">🚀</span>
-            <span class="text-[10px] sm:text-xs font-black mt-0.5">발사</span>
-          </button>
-        </div>
-      </div>
     </section>
 
     <!-- 일반 화면용 외부 컨트롤 패드 -->
@@ -266,6 +271,7 @@
         </div>
       </div>
     </section>
+    </div>
 
     <!-- 명예의 전당 -->
     <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-col gap-2.5 shadow-xl">
@@ -2275,12 +2281,15 @@
         ctx.fillStyle = '#090d16';
         ctx.fillRect(0, 0, viewW, viewH);
 
+        const wideFullscreen = Boolean(document.fullscreenElement) && viewW / viewH > CAM_W / CAM_H;
         const scale = Math.min(viewW / CAM_W, viewH / CAM_H);
-        const ox = (viewW - CAM_W * scale) / 2;
-        const oy = viewH - CAM_H * scale;
+        const scaleX = wideFullscreen ? viewW / CAM_W : scale;
+        const scaleY = wideFullscreen ? viewH / CAM_H : scale;
+        const ox = wideFullscreen ? 0 : (viewW - CAM_W * scale) / 2;
+        const oy = wideFullscreen ? 0 : viewH - CAM_H * scale;
         ctx.save();
         ctx.translate(ox, oy);
-        ctx.scale(scale, scale);
+        ctx.scale(scaleX, scaleY);
         renderWorld();
         ctx.restore();
 
@@ -2288,44 +2297,42 @@
       }
 
       // ==========================================
-      // 5. HUD & 입력 이벤트 바인딩 (일반 패드 + 전체화면 전용 하단 패드)
+      // 5. HUD & 입력 이벤트 바인딩 (기존 게임패드)
       // ==========================================
       function updateHud() {
-        document.getElementById('scoreDisplay').textContent = Math.floor(score).toLocaleString();
+        document.getElementById('highScoreDisplay').textContent = Math.floor(score).toLocaleString();
         document.getElementById('waveDisplay').textContent = SECTOR_INFO[sector].title;
-
-        const w = WEAPON_DEFS[player.weaponIdx];
-        document.getElementById('weaponDisplay').textContent = `${w.icon} ${w.name}`;
 
         document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
           const idx = Number(btn.dataset.weapon);
-          const isFsBtn = btn.closest('#fsControlDock') !== null;
-          const pyClass = isFsBtn ? 'py-2' : 'py-2.5';
           if (idx === player.weaponIdx) {
-            btn.className = `weapon-slot-btn rounded-xl ${pyClass} border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow`;
+            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
           } else {
-            btn.className = `weapon-slot-btn rounded-xl ${pyClass} border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80`;
+            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
           }
         });
       }
 
       function screenToCamera(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
+        const wideFullscreen = Boolean(document.fullscreenElement) && viewW / viewH > CAM_W / CAM_H;
         const scale = Math.min(viewW / CAM_W, viewH / CAM_H);
-        const ox = (viewW - CAM_W * scale) / 2;
-        const oy = viewH - CAM_H * scale;
+        const scaleX = wideFullscreen ? viewW / CAM_W : scale;
+        const scaleY = wideFullscreen ? viewH / CAM_H : scale;
+        const ox = wideFullscreen ? 0 : (viewW - CAM_W * scale) / 2;
+        const oy = wideFullscreen ? 0 : viewH - CAM_H * scale;
         return {
-          x: (clientX - rect.left - ox) / scale,
-          y: (clientY - rect.top - oy) / scale
+          x: (clientX - rect.left - ox) / scaleX,
+          y: (clientY - rect.top - oy) / scaleY
         };
       }
 
-      const gameAreaSection = document.getElementById('gameAreaSection');
+      const fullscreenStage = document.getElementById('fullscreenStage');
       const fullscreenBtn = document.getElementById('fullscreenBtn');
       fullscreenBtn.addEventListener('click', async () => {
         try {
           if (!document.fullscreenElement) {
-            await gameAreaSection.requestFullscreen();
+            await fullscreenStage.requestFullscreen();
             fullscreenBtn.textContent = '✕ 축소';
           } else {
             await document.exitFullscreen();
@@ -2338,8 +2345,18 @@
       });
       document.addEventListener('fullscreenchange', () => {
         fullscreenBtn.textContent = document.fullscreenElement ? '✕ 축소' : '⛶ 전체화면';
-        setTimeout(resizeCanvas, 100);
+        requestAnimationFrame(() => setTimeout(resizeCanvas, 100));
       });
+
+      window.addEventListener('orientationchange', () => {
+        setTimeout(resizeCanvas, 120);
+        setTimeout(resizeCanvas, 400);
+      });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          if (document.fullscreenElement) resizeCanvas();
+        });
+      }
 
       canvas.addEventListener('pointermove', (e) => {
         pointerScreen = screenToCamera(e.clientX, e.clientY);
@@ -2369,7 +2386,6 @@
         btn.addEventListener('click', () => selectWeapon(Number(btn.dataset.weapon)));
       });
 
-      // 대시 버튼 바인딩 (일반 패드 + 전체화면 전용 패드 공용)
       function bindDashButton(btnEl) {
         if (!btnEl) return;
         btnEl.addEventListener('pointerdown', (e) => {
@@ -2379,9 +2395,7 @@
         });
       }
       bindDashButton(document.getElementById('mobDashBtn'));
-      bindDashButton(document.getElementById('fsDashBtn'));
 
-      // 발사(미사일) 버튼 바인딩 (일반 패드 + 전체화면 전용 패드 공용)
       function bindFireButton(btnEl) {
         if (!btnEl) return;
         btnEl.addEventListener('pointerdown', (e) => {
@@ -2395,9 +2409,7 @@
         btnEl.addEventListener('pointerleave', release);
       }
       bindFireButton(document.getElementById('missileFireBtn'));
-      bindFireButton(document.getElementById('fsMissileBtn'));
 
-      // 조이스틱 바인딩 헬퍼 (일반 패드 + 전체화면 전용 패드 공용)
       function bindVirtualStick(zoneEl, knobEl) {
         if (!zoneEl || !knobEl) return;
         let activePointerId = null;
@@ -2441,7 +2453,6 @@
         window.addEventListener('pointercancel', resetStick);
       }
       bindVirtualStick(document.getElementById('moveStickZone'), document.getElementById('moveStickKnob'));
-      bindVirtualStick(document.getElementById('fsStickZone'), document.getElementById('fsStickKnob'));
 
       // ==========================================
       // 6. 랭킹 / 로그인 / VIP / 바로가기 / 토스트
