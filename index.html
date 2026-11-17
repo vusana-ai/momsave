@@ -38,10 +38,9 @@
     /* 평소에는 게임 영역과 기존 조작 패드가 원래 위치에 참여한다. */
     #fullscreenStage { display: contents; }
 
-    /* 전체화면에서는 게임 영역과 조작 패드를 꽉 차게 배치하되 화면을 가리지 않도록 flex 수직 배치 적용 */
+    /* 전체화면에서는 게임 캔버스가 100% 꽉 차고, 조작 패드는 투명하게 하단 모서리에 슬림 배치 */
     #fullscreenStage:fullscreen {
-      display: flex !important;
-      flex-direction: column !important;
+      display: block !important;
       width: 100vw !important;
       height: 100dvh !important;
       position: fixed !important;
@@ -53,9 +52,8 @@
     }
 
     #fullscreenStage:fullscreen #gameAreaSection {
-      flex: 1 !important;
       width: 100% !important;
-      height: auto !important;
+      height: 100% !important;
       max-width: none !important;
       max-height: none !important;
       border: none !important;
@@ -71,20 +69,60 @@
       max-height: none !important;
     }
 
+    /* 전체화면 패드: 배경박스 제거하고 투명 오버레이 + 컴팩트 사이즈 적용 */
     #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] {
       display: flex !important;
-      position: relative !important;
-      left: auto !important;
-      right: auto !important;
-      bottom: auto !important;
+      position: fixed !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
       z-index: 30 !important;
-      flex: none !important;
       margin: 0 !important;
+      padding: 8px 14px 12px !important;
+      border: none !important;
       border-radius: 0 !important;
-      background: rgba(15, 23, 42, 0.92) !important;
-      backdrop-filter: blur(8px) !important;
-      -webkit-backdrop-filter: blur(8px) !important;
-      border-top: 1px solid rgba(51, 65, 85, 0.8) !important;
+      background: linear-gradient(to top, rgba(2, 6, 23, 0.42), transparent) !important;
+      box-shadow: none !important;
+      pointer-events: none !important;
+    }
+
+    /* 투명 패드 내부 조작 버튼들만 터치 허용 및 반투명 최적화 */
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] #moveStickZone,
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] button {
+      pointer-events: auto !important;
+    }
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] #moveStickZone {
+      width: 88px !important;
+      height: 88px !important;
+      background: rgba(15, 23, 42, 0.45) !important;
+      backdrop-filter: blur(2px) !important;
+    }
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] #moveStickKnob {
+      width: 38px !important;
+      height: 38px !important;
+    }
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] .weapon-slot-btn {
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
+      background: rgba(15, 23, 42, 0.55) !important;
+    }
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] #mobDashBtn {
+      padding: 10px 12px !important;
+      background: rgba(30, 41, 59, 0.65) !important;
+    }
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] #missileFireBtn {
+      width: 64px !important;
+      height: 64px !important;
+      opacity: 0.88 !important;
+    }
+
+    #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] #missileFireBtn span:first-child {
+      font-size: 1.35rem !important;
     }
 
     /* 휴대폰 가로 회전: 고정 폭/높이로 인한 좌우 분할과 가로 스크롤 방지 */
@@ -115,7 +153,7 @@
       }
 
       #fullscreenStage:fullscreen > [aria-label="게임 조작 패드"] {
-        padding: 6px 12px !important;
+        padding: 4px 16px 8px !important;
         gap: 8px !important;
         max-width: 100% !important;
         overflow: hidden !important;
@@ -189,7 +227,7 @@
 
   <!-- Main Content -->
   <main class="flex-1 max-w-5xl w-full mx-auto px-2.5 sm:px-4 py-3 sm:py-4 flex flex-col gap-3">
-    <!-- 상단 작전 개시 버튼 바 (현재 점수 및 장착 무기 영역 제거됨) -->
+    <!-- 상단 작전 개시 버튼 바 -->
     <section class="bg-slate-900/90 border border-amber-500/35 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
       <div>
         <div class="text-[10px] text-amber-300/90 font-bold">🛸 외계인 침공 2D 액션</div>
@@ -201,7 +239,7 @@
     </section>
 
     <div id="fullscreenStage">
-    <!-- 게임 캔버스 영역 (전체화면 진입 시 기존 조작 패드가 하단에 오버레이) -->
+    <!-- 게임 캔버스 영역 -->
     <section id="gameAreaSection" class="relative bg-slate-950 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-black/60">
       <div id="canvasWrapper" class="relative w-full aspect-[4/3] sm:aspect-[16/9] min-h-[340px] max-h-[620px] bg-slate-900 cursor-crosshair">
         <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
@@ -227,46 +265,46 @@
 
     </section>
 
-    <!-- 일반 화면용 외부 컨트롤 패드 -->
-    <section aria-label="게임 조작 패드" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-5 sm:gap-6 select-none shadow-xl">
+    <!-- 일반 화면 및 전체화면 공용 컨트롤 패드 -->
+    <section aria-label="게임 조작 패드" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-2.5 sm:p-4 flex items-center justify-between gap-4 sm:gap-6 select-none shadow-xl">
       <!-- 좌측: O형 조이스틱 -->
       <div class="flex flex-col items-center gap-1.5 shrink-0">
-        <div id="moveStickZone" style="touch-action:none" class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-950 border-2 border-sky-500/50 shadow-inner flex items-center justify-center cursor-pointer">
+        <div id="moveStickZone" style="touch-action:none" class="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-slate-950 border-2 border-sky-500/50 shadow-inner flex items-center justify-center cursor-pointer">
           <div class="absolute inset-2 rounded-full border border-dashed border-slate-700/80 pointer-events-none"></div>
           <span class="absolute top-1.5 left-1/2 -translate-x-1/2 text-[10px] font-black text-sky-400/80 pointer-events-none">▲</span>
           <span class="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[10px] font-black text-slate-400/80 pointer-events-none">▼</span>
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 pointer-events-none">◀</span>
           <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 pointer-events-none">▶</span>
-          <div id="moveStickKnob" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-xs font-black text-slate-950">
+          <div id="moveStickKnob" class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-xs font-black text-slate-950">
             🕹️
           </div>
         </div>
       </div>
 
       <!-- 우측: 위쪽 무기선택 4개 + 아래쪽 미사일 버튼 -->
-      <div class="flex flex-col items-end gap-2.5 flex-1 min-w-0">
-        <div class="grid grid-cols-4 gap-1.5 w-48 sm:w-64 ml-auto">
-          <button type="button" data-weapon="0" title="헤비 머신건" class="weapon-slot-btn rounded-xl py-2.5 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
-            <div class="text-lg sm:text-xl leading-none">🔫</div>
+      <div class="flex flex-col items-end gap-2 flex-1 min-w-0">
+        <div class="grid grid-cols-4 gap-1.5 w-44 sm:w-64 ml-auto">
+          <button type="button" data-weapon="0" title="헤비 머신건" class="weapon-slot-btn rounded-xl py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
+            <div class="text-base sm:text-xl leading-none">🔫</div>
           </button>
-          <button type="button" data-weapon="1" title="로켓 런처" class="weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-            <div class="text-lg sm:text-xl leading-none">💣</div>
+          <button type="button" data-weapon="1" title="로켓 런처" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-base sm:text-xl leading-none">💣</div>
           </button>
-          <button type="button" data-weapon="2" title="레이저 건" class="weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-            <div class="text-lg sm:text-xl leading-none">⚡</div>
+          <button type="button" data-weapon="2" title="레이저 건" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-base sm:text-xl leading-none">⚡</div>
           </button>
-          <button type="button" data-weapon="3" title="플레임 샷" class="weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-            <div class="text-lg sm:text-xl leading-none">🔥</div>
+          <button type="button" data-weapon="3" title="플레임 샷" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-base sm:text-xl leading-none">🔥</div>
           </button>
         </div>
 
-        <div class="flex items-center justify-end gap-2.5 w-48 sm:w-64 ml-auto">
-          <button id="mobDashBtn" type="button" style="touch-action:none" class="px-4 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-amber-400/50 text-xs sm:text-sm font-black text-amber-300 shadow cursor-pointer transition">
+        <div class="flex items-center justify-end gap-2 w-44 sm:w-64 ml-auto">
+          <button id="mobDashBtn" type="button" style="touch-action:none" class="px-3.5 py-2.5 sm:px-4 sm:py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-amber-400/50 text-xs sm:text-sm font-black text-amber-300 shadow cursor-pointer transition">
             ⚡ 대시
           </button>
-          <button id="missileFireBtn" type="button" style="touch-action:none" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-orange-400 via-rose-500 to-red-600 hover:from-orange-300 hover:to-red-500 active:scale-95 border-2 border-amber-200/90 shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center text-white cursor-pointer transition shrink-0">
-            <span class="text-2xl sm:text-3xl leading-none">🚀</span>
-            <span class="text-[11px] sm:text-xs font-black mt-1">미사일</span>
+          <button id="missileFireBtn" type="button" style="touch-action:none" class="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-orange-400 via-rose-500 to-red-600 hover:from-orange-300 hover:to-red-500 active:scale-95 border-2 border-amber-200/90 shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center text-white cursor-pointer transition shrink-0">
+            <span class="text-xl sm:text-3xl leading-none">🚀</span>
+            <span class="text-[10px] sm:text-xs font-black mt-0.5">미사일</span>
           </button>
         </div>
       </div>
@@ -616,11 +654,31 @@
       const camera = { x: 0, y: MAP_H - CAM_H };
 
       const SECTOR_INFO = {
-        1: { title: 'STAGE 1 · 학교 교실', nextLabel: '지하철역으로', bossName: '👨‍🦲 외계 빙의 대머리 교장', bossHp: 850 },
-        2: { title: 'STAGE 2 · 지하철역', nextLabel: '도심 외곽으로', bossName: '🤖 외계인 역장 메카', bossHp: 1150 },
-        3: { title: 'STAGE 3 · 침공된 도시', nextLabel: '엄마 회사로', bossName: '👾 외계 돌격 사령관', bossHp: 1450 },
-        4: { title: 'STAGE 4 · 엄마 회사', nextLabel: '엄마 구출', bossName: '👽 외계인 대장 보스', bossHp: 1850 }
+        1: { title: 'STAGE 1 · 학교 교실', shortTitle: 'STAGE 1', subTitle: '학교 교실 탈출 작전', nextLabel: '지하철역으로', bossName: '👨‍🦲 외계 빙의 대머리 교장', bossHp: 850 },
+        2: { title: 'STAGE 2 · 지하철역', shortTitle: 'STAGE 2', subTitle: '지하철역 돌파 작전', nextLabel: '도심 외곽으로', bossName: '🤖 외계인 역장 메카', bossHp: 1150 },
+        3: { title: 'STAGE 3 · 침공된 도시', shortTitle: 'STAGE 3', subTitle: '침공된 도심 구출 작전', nextLabel: '엄마 회사로', bossName: '👾 외계 돌격 사령관', bossHp: 1450 },
+        4: { title: 'STAGE 4 · 엄마 회사', shortTitle: 'STAGE 4', subTitle: '최종 결전 · 엄마 구출', nextLabel: '엄마 구출', bossName: '👽 외계인 대장 보스', bossHp: 1850 }
       };
+
+      // 스테이지 시작 시 중앙 배너 애니메이션 상태
+      let stageBanner = {
+        active: false,
+        timer: 0,
+        duration: 2.2,
+        stageText: 'STAGE 1',
+        subText: '학교 교실 탈출 작전'
+      };
+
+      function triggerStageBanner(stageNum) {
+        const info = SECTOR_INFO[stageNum];
+        stageBanner = {
+          active: true,
+          timer: 0,
+          duration: 2.2,
+          stageText: info.shortTitle,
+          subText: info.subTitle
+        };
+      }
 
       function resizeCanvas() {
         const rect = canvasWrapper.getBoundingClientRect();
@@ -804,6 +862,7 @@
           mom.jumpPhase = 0;
         }
         updateHud();
+        triggerStageBanner(stageNum);
       }
 
       function resetMatch() {
@@ -1059,6 +1118,13 @@
       }
 
       function updateGame(dt) {
+        if (stageBanner.active) {
+          stageBanner.timer += dt;
+          if (stageBanner.timer >= stageBanner.duration) {
+            stageBanner.active = false;
+          }
+        }
+
         if (screenShake > 0) screenShake = Math.max(0, screenShake - dt * 30);
         if (player.fireCd > 0) player.fireCd = Math.max(0, player.fireCd - dt);
         if (player.recoil > 0) player.recoil = Math.max(0, player.recoil - dt * 36);
@@ -1172,7 +1238,6 @@
           playSfx('portal');
           score += 500;
           const nextSec = sector + 1;
-          showToast(`🌀 포탈 통과! ${SECTOR_INFO[nextSec].title} 구역으로 진입합니다!`);
           setupSector(nextSec);
           return;
         }
@@ -1433,7 +1498,7 @@
       }
 
       // ==========================================
-      // 4. 4개 섹터 실감나는 디테일 배경 & 좌측 상단 HP 게이지 렌더링
+      // 4. 4개 섹터 실감나는 디테일 배경 & 중앙 STAGE 배너 렌더링
       // ==========================================
       function drawOutlinedRect(x, y, w, h, r, fill, stroke = '#090d16', lw = 3) {
         ctx.fillStyle = fill;
@@ -1952,6 +2017,69 @@
         ctx.restore();
       }
 
+      // 게임 시작/스테이지 진입 시 화면 중앙 STAGE 1 배너 렌더링
+      function renderCenterStageBanner() {
+        if (!stageBanner.active) return;
+        const t = stageBanner.timer;
+        const dur = stageBanner.duration;
+        let alpha = 1;
+        let scalePop = 1;
+
+        if (t < 0.25) {
+          const p = t / 0.25;
+          alpha = p;
+          scalePop = 0.8 + 0.2 * p;
+        } else if (t > dur - 0.45) {
+          alpha = Math.max(0, (dur - t) / 0.45);
+        }
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(CAM_W / 2, CAM_H * 0.36);
+        ctx.scale(scalePop, scalePop);
+
+        // 중앙 반투명 배경 띠
+        const bannerW = 460;
+        const bannerH = 92;
+        const grad = ctx.createLinearGradient(-bannerW / 2, 0, bannerW / 2, 0);
+        grad.addColorStop(0, 'rgba(9, 13, 22, 0)');
+        grad.addColorStop(0.2, 'rgba(9, 13, 22, 0.86)');
+        grad.addColorStop(0.8, 'rgba(9, 13, 22, 0.86)');
+        grad.addColorStop(1, 'rgba(9, 13, 22, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(-bannerW / 2, -bannerH / 2, bannerW, bannerH);
+
+        // 상단/하단 골드 라인
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.75)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-180, -bannerH / 2);
+        ctx.lineTo(180, -bannerH / 2);
+        ctx.moveTo(-180, bannerH / 2);
+        ctx.lineTo(180, bannerH / 2);
+        ctx.stroke();
+
+        // STAGE 1 메인 텍스트
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 38px "Inter", "Noto Sans KR", sans-serif';
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 6;
+        ctx.strokeText(stageBanner.stageText, 0, -10);
+        ctx.fillStyle = '#facc15';
+        ctx.fillText(stageBanner.stageText, 0, -10);
+
+        // 부제목 텍스트
+        ctx.font = '800 16px "Noto Sans KR", sans-serif';
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 4;
+        ctx.strokeText(stageBanner.subText, 0, 22);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillText(stageBanner.subText, 0, 22);
+
+        ctx.restore();
+      }
+
       function renderWorld() {
         ctx.save();
         if (screenShake > 0) {
@@ -2267,6 +2395,7 @@
         ctx.restore();
 
         renderTopLeftHud();
+        renderCenterStageBanner();
 
         ctx.restore();
       }
@@ -2306,9 +2435,9 @@
         document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
           const idx = Number(btn.dataset.weapon);
           if (idx === player.weaponIdx) {
-            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
+            btn.className = 'weapon-slot-btn rounded-xl py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
           } else {
-            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
+            btn.className = 'weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
           }
         });
       }
@@ -2420,7 +2549,7 @@
           const centerY = rect.top + rect.height / 2;
           const dx = cx - centerX;
           const dy = cy - centerY;
-          const maxR = rect.width / 2 - 20;
+          const maxR = rect.width / 2 - 18;
           const dist = Math.hypot(dx, dy);
           const clamped = Math.min(dist, maxR);
           const ang = Math.atan2(dy, dx);
