@@ -163,7 +163,8 @@
       <div class="flex flex-col items-center gap-1.5 shrink-0">
         <div id="moveStickZone" style="touch-action:none" class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-950 border-2 border-sky-500/50 shadow-inner flex items-center justify-center cursor-pointer">
           <div class="absolute inset-2 rounded-full border border-dashed border-slate-700/80 pointer-events-none"></div>
-          <span class="absolute top-1.5 left-1/2 -translate-x-1/2 text-[10px] font-black text-sky-400/80 pointer-events-none">▲ 점프</span>
+          <span class="absolute top-1.5 left-1/2 -translate-x-1/2 text-[10px] font-black text-sky-400/80 pointer-events-none">▲</span>
+          <span class="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[10px] font-black text-slate-400/80 pointer-events-none">▼</span>
           <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 pointer-events-none">◀</span>
           <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 pointer-events-none">▶</span>
           <div id="moveStickKnob" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-xs font-black text-slate-950">
@@ -172,24 +173,20 @@
         </div>
       </div>
 
-      <!-- 우측: 위쪽 무기선택 4개 + 아래쪽 미사일 버튼 -->
+      <!-- 우측: 위쪽 무기선택 4개(아이콘만) + 아래쪽 미사일 버튼 -->
       <div class="flex flex-col items-end gap-2.5 flex-1 min-w-0">
         <div class="grid grid-cols-4 gap-1.5 w-full max-w-md">
-          <button type="button" data-weapon="0" class="weapon-slot-btn rounded-xl px-1.5 py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
-            <div class="text-sm sm:text-base leading-none">🔫</div>
-            <div class="text-[10px] font-black text-amber-300 truncate mt-1">[1] 연사총</div>
+          <button type="button" data-weapon="0" title="헤비 머신건" class="weapon-slot-btn rounded-xl py-2.5 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
+            <div class="text-lg sm:text-xl leading-none">🔫</div>
           </button>
-          <button type="button" data-weapon="1" class="weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-            <div class="text-sm sm:text-base leading-none">💣</div>
-            <div class="text-[10px] font-black text-orange-300 truncate mt-1">[2] 미사일</div>
+          <button type="button" data-weapon="1" title="로켓 런처" class="weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-lg sm:text-xl leading-none">💣</div>
           </button>
-          <button type="button" data-weapon="2" class="weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-            <div class="text-sm sm:text-base leading-none">⚡</div>
-            <div class="text-[10px] font-black text-sky-300 truncate mt-1">[3] 관통빔</div>
+          <button type="button" data-weapon="2" title="레이저 건" class="weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-lg sm:text-xl leading-none">⚡</div>
           </button>
-          <button type="button" data-weapon="3" class="weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
-            <div class="text-sm sm:text-base leading-none">🔥</div>
-            <div class="text-[10px] font-black text-rose-300 truncate mt-1">[4] 화염포</div>
+          <button type="button" data-weapon="3" title="플레임 샷" class="weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-lg sm:text-xl leading-none">🔥</div>
           </button>
         </div>
 
@@ -1113,16 +1110,32 @@
           camera.x += (targetCamX - camera.x) * Math.min(1, dt * 8.0);
         }
 
-        // 조준 및 발사
+        // 조준 및 발사 (상/하/좌/우 4방향 전용, 대각선 제외)
         const worldAimX = pointerScreen.x + camera.x;
         const worldAimY = pointerScreen.y + camera.y;
 
         if (missileBtnHeld) {
-          const dyAim = (moveStickVec.active && Math.abs(moveStickVec.y) > 0.25) ? moveStickVec.y * 0.45 : 0;
-          player.aimAngle = player.facing >= 0 ? dyAim : Math.PI - dyAim;
+          let aimDir = player.facing >= 0 ? 0 : Math.PI;
+          if (moveStickVec.active) {
+            if (Math.abs(moveStickVec.y) > Math.abs(moveStickVec.x) && Math.abs(moveStickVec.y) > 0.3) {
+              aimDir = moveStickVec.y < 0 ? -Math.PI / 2 : Math.PI / 2;
+            } else if (Math.abs(moveStickVec.x) > 0.2) {
+              aimDir = moveStickVec.x >= 0 ? 0 : Math.PI;
+            }
+          } else if (keys['ArrowUp'] || keys['KeyW']) {
+            aimDir = -Math.PI / 2;
+          } else if (keys['ArrowDown'] || keys['KeyS']) {
+            aimDir = Math.PI / 2;
+          } else if (keys['ArrowLeft'] || keys['KeyA']) {
+            aimDir = Math.PI;
+          } else if (keys['ArrowRight'] || keys['KeyD']) {
+            aimDir = 0;
+          }
+          player.aimAngle = aimDir;
           fireWeapon();
         } else {
-          player.aimAngle = Math.atan2(worldAimY - (player.y - 4), worldAimX - player.x);
+          const rawAng = Math.atan2(worldAimY - (player.y - 4), worldAimX - player.x);
+          player.aimAngle = Math.round(rawAng / (Math.PI / 2)) * (Math.PI / 2);
           if (isFiring) fireWeapon();
         }
 
@@ -1932,9 +1945,9 @@
         document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
           const idx = Number(btn.dataset.weapon);
           if (idx === player.weaponIdx) {
-            btn.className = 'weapon-slot-btn rounded-xl px-1.5 py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
+            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
           } else {
-            btn.className = 'weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
+            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
           }
         });
       }
