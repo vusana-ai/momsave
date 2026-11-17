@@ -34,20 +34,27 @@
       50% { box-shadow: 0 0 15px rgba(232, 121, 249, 0.8); }
     }
     .vip-btn-glow { animation: vipPulse 2.2s infinite ease-in-out; }
+
+    /* 전체화면 모드: 위쪽은 게임 화면, 아래쪽은 게임 화면을 가리지 않는 전용 조종 영역으로 분리 */
     #gameAreaSection:fullscreen {
       width: 100vw !important;
-      height: 100vh !important;
+      height: 100dvh !important;
       border-radius: 0 !important;
       border: none !important;
-      display: flex;
-      flex-direction: column;
-      background: #020617;
+      display: flex !important;
+      flex-direction: column !important;
+      background: #020617 !important;
     }
     #gameAreaSection:fullscreen #canvasWrapper {
-      flex: 1;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
       aspect-ratio: auto !important;
       max-height: none !important;
-      height: 100% !important;
+      height: auto !important;
+    }
+    #gameAreaSection:fullscreen #fsControlDock {
+      display: flex !important;
+      flex: 0 0 auto !important;
     }
   </style>
 </head>
@@ -138,7 +145,7 @@
       </div>
     </section>
 
-    <!-- 게임 캔버스 영역 -->
+    <!-- 게임 캔버스 영역 (전체화면 진입 시 하단에 전용 조종 영역 자동 도킹) -->
     <section id="gameAreaSection" class="relative bg-slate-950 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-black/60">
       <div id="canvasWrapper" class="relative w-full aspect-[4/3] sm:aspect-[16/9] min-h-[340px] max-h-[620px] bg-slate-900 cursor-crosshair">
         <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
@@ -161,9 +168,61 @@
           </button>
         </div>
       </div>
+
+      <!-- 전체화면 전용 하단 조종 화면 (게임 화면을 가리지 않도록 캔버스 아래쪽에 독립 배치) -->
+      <div id="fsControlDock" aria-label="전체화면 전용 조작 패드"
+        class="hidden w-full bg-slate-900 border-t border-slate-800 px-4 sm:px-8 py-2.5 sm:py-3 items-center justify-between gap-4 select-none z-20">
+        <!-- 좌측: 전체화면 전용 조이스틱 -->
+        <div class="flex items-center gap-3 shrink-0">
+          <div id="fsStickZone" style="touch-action:none"
+            class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-950 border-2 border-sky-500/60 shadow-inner flex items-center justify-center cursor-pointer">
+            <div class="absolute inset-1.5 rounded-full border border-dashed border-slate-700/80 pointer-events-none"></div>
+            <span class="absolute top-1 left-1/2 -translate-x-1/2 text-[9px] font-black text-sky-400/80 pointer-events-none">▲</span>
+            <span class="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-black text-slate-400/80 pointer-events-none">▼</span>
+            <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 pointer-events-none">◀</span>
+            <span class="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 pointer-events-none">▶</span>
+            <div id="fsStickKnob"
+              class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-xs font-black text-slate-950">
+              🕹️
+            </div>
+          </div>
+        </div>
+
+        <!-- 중앙: 무기 4종 빠른 전환 -->
+        <div class="flex flex-col items-center gap-1.5 flex-1 max-w-xs">
+          <div class="grid grid-cols-4 gap-1.5 w-full">
+            <button type="button" data-weapon="0" title="헤비 머신건" class="weapon-slot-btn rounded-xl py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
+              <div class="text-base sm:text-lg leading-none">🔫</div>
+            </button>
+            <button type="button" data-weapon="1" title="로켓 런처" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+              <div class="text-base sm:text-lg leading-none">💣</div>
+            </button>
+            <button type="button" data-weapon="2" title="레이저 건" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+              <div class="text-base sm:text-lg leading-none">⚡</div>
+            </button>
+            <button type="button" data-weapon="3" title="플레임 샷" class="weapon-slot-btn rounded-xl py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+              <div class="text-base sm:text-lg leading-none">🔥</div>
+            </button>
+          </div>
+          <div class="text-[10px] font-bold text-slate-400">이동 · 점프 · 무기 전환</div>
+        </div>
+
+        <!-- 우측: 대시 + 미사일(발사) 버튼 -->
+        <div class="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+          <button id="fsDashBtn" type="button" style="touch-action:none"
+            class="px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-amber-400/60 text-xs sm:text-sm font-black text-amber-300 shadow cursor-pointer transition">
+            ⚡ 대시
+          </button>
+          <button id="fsMissileBtn" type="button" style="touch-action:none"
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-orange-400 via-rose-500 to-red-600 hover:from-orange-300 hover:to-red-500 active:scale-95 border-2 border-amber-200/90 shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center text-white cursor-pointer transition shrink-0">
+            <span class="text-xl sm:text-2xl leading-none">🚀</span>
+            <span class="text-[10px] sm:text-xs font-black mt-0.5">발사</span>
+          </button>
+        </div>
+      </div>
     </section>
 
-    <!-- 외부 컨트롤 패드 -->
+    <!-- 일반 화면용 외부 컨트롤 패드 -->
     <section aria-label="게임 조작 패드" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-5 sm:gap-6 select-none shadow-xl">
       <!-- 좌측: O형 조이스틱 -->
       <div class="flex flex-col items-center gap-1.5 shrink-0">
@@ -543,7 +602,6 @@
       const MAP_H = 640;
       const GRAVITY = 1480;
 
-      // 보스전 진입 후 뒤로 약 1페이지(CAM_W) 이상 여유 있게 물러날 수 있도록 확장
       const BOSS_TRIGGER_X = 5500;
       const BOSS_ARENA_MIN_X = 5160;
 
@@ -1113,7 +1171,7 @@
           return;
         }
 
-        // 카메라 X/Y 추적 (보스방 잠금 시에도 한 페이지 뒤로 물러나는 범위를 자연스럽게 추적)
+        // 카메라 X/Y 추적
         const minCamX = bossArenaLocked ? BOSS_ARENA_MIN_X : 0;
         const desiredOffset = moveX > 0 ? CAM_W * 0.34 : (moveX < 0 ? CAM_W * 0.66 : CAM_W * 0.40);
         const targetCamX = Math.max(minCamX, Math.min(MAP_W - CAM_W, player.x - desiredOffset));
@@ -2230,7 +2288,7 @@
       }
 
       // ==========================================
-      // 5. HUD & 입력 이벤트 바인딩
+      // 5. HUD & 입력 이벤트 바인딩 (일반 패드 + 전체화면 전용 하단 패드)
       // ==========================================
       function updateHud() {
         document.getElementById('scoreDisplay').textContent = Math.floor(score).toLocaleString();
@@ -2241,10 +2299,12 @@
 
         document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
           const idx = Number(btn.dataset.weapon);
+          const isFsBtn = btn.closest('#fsControlDock') !== null;
+          const pyClass = isFsBtn ? 'py-2' : 'py-2.5';
           if (idx === player.weaponIdx) {
-            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
+            btn.className = `weapon-slot-btn rounded-xl ${pyClass} border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow`;
           } else {
-            btn.className = 'weapon-slot-btn rounded-xl py-2.5 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
+            btn.className = `weapon-slot-btn rounded-xl ${pyClass} border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80`;
           }
         });
       }
@@ -2309,62 +2369,79 @@
         btn.addEventListener('click', () => selectWeapon(Number(btn.dataset.weapon)));
       });
 
-      document.getElementById('mobDashBtn').addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        getAC();
-        triggerDash();
-      });
-
-      const missileFireBtn = document.getElementById('missileFireBtn');
-      missileFireBtn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        getAC();
-        missileBtnHeld = true;
-      });
-      const releaseMissileBtn = () => { missileBtnHeld = false; };
-      missileFireBtn.addEventListener('pointerup', releaseMissileBtn);
-      missileFireBtn.addEventListener('pointercancel', releaseMissileBtn);
-      missileFireBtn.addEventListener('pointerleave', releaseMissileBtn);
-
-      const moveZone = document.getElementById('moveStickZone');
-      const moveKnob = document.getElementById('moveStickKnob');
-      let movePointerId = null;
-
-      function updateMoveStick(cx, cy) {
-        const rect = moveZone.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dx = cx - centerX;
-        const dy = cy - centerY;
-        const maxR = rect.width / 2 - 22;
-        const dist = Math.hypot(dx, dy);
-        const clamped = Math.min(dist, maxR);
-        const ang = Math.atan2(dy, dx);
-        moveKnob.style.transform = `translate(${Math.cos(ang) * clamped}px, ${Math.sin(ang) * clamped}px)`;
-        const nx = maxR > 0 ? (Math.cos(ang) * clamped) / maxR : 0;
-        const ny = maxR > 0 ? (Math.sin(ang) * clamped) / maxR : 0;
-        moveStickVec = { x: nx, y: ny, active: true };
+      // 대시 버튼 바인딩 (일반 패드 + 전체화면 전용 패드 공용)
+      function bindDashButton(btnEl) {
+        if (!btnEl) return;
+        btnEl.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          getAC();
+          triggerDash();
+        });
       }
+      bindDashButton(document.getElementById('mobDashBtn'));
+      bindDashButton(document.getElementById('fsDashBtn'));
 
-      moveZone.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        getAC();
-        movePointerId = e.pointerId;
-        if (moveZone.setPointerCapture) try { moveZone.setPointerCapture(e.pointerId); } catch {}
-        updateMoveStick(e.clientX, e.clientY);
-      });
-      window.addEventListener('pointermove', (e) => {
-        if (movePointerId !== null && e.pointerId === movePointerId) updateMoveStick(e.clientX, e.clientY);
-      });
-      const resetMoveStick = (e) => {
-        if (movePointerId !== null && e.pointerId === movePointerId) {
-          movePointerId = null;
-          moveKnob.style.transform = 'translate(0px, 0px)';
-          moveStickVec = { x: 0, y: 0, active: false };
+      // 발사(미사일) 버튼 바인딩 (일반 패드 + 전체화면 전용 패드 공용)
+      function bindFireButton(btnEl) {
+        if (!btnEl) return;
+        btnEl.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          getAC();
+          missileBtnHeld = true;
+        });
+        const release = () => { missileBtnHeld = false; };
+        btnEl.addEventListener('pointerup', release);
+        btnEl.addEventListener('pointercancel', release);
+        btnEl.addEventListener('pointerleave', release);
+      }
+      bindFireButton(document.getElementById('missileFireBtn'));
+      bindFireButton(document.getElementById('fsMissileBtn'));
+
+      // 조이스틱 바인딩 헬퍼 (일반 패드 + 전체화면 전용 패드 공용)
+      function bindVirtualStick(zoneEl, knobEl) {
+        if (!zoneEl || !knobEl) return;
+        let activePointerId = null;
+
+        function updateStick(cx, cy) {
+          const rect = zoneEl.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const dx = cx - centerX;
+          const dy = cy - centerY;
+          const maxR = rect.width / 2 - 20;
+          const dist = Math.hypot(dx, dy);
+          const clamped = Math.min(dist, maxR);
+          const ang = Math.atan2(dy, dx);
+          knobEl.style.transform = `translate(${Math.cos(ang) * clamped}px, ${Math.sin(ang) * clamped}px)`;
+          const nx = maxR > 0 ? (Math.cos(ang) * clamped) / maxR : 0;
+          const ny = maxR > 0 ? (Math.sin(ang) * clamped) / maxR : 0;
+          moveStickVec = { x: nx, y: ny, active: true };
         }
-      };
-      window.addEventListener('pointerup', resetMoveStick);
-      window.addEventListener('pointercancel', resetMoveStick);
+
+        zoneEl.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          getAC();
+          activePointerId = e.pointerId;
+          if (zoneEl.setPointerCapture) try { zoneEl.setPointerCapture(e.pointerId); } catch {}
+          updateStick(e.clientX, e.clientY);
+        });
+        window.addEventListener('pointermove', (e) => {
+          if (activePointerId !== null && e.pointerId === activePointerId) {
+            updateStick(e.clientX, e.clientY);
+          }
+        });
+        const resetStick = (e) => {
+          if (activePointerId !== null && e.pointerId === activePointerId) {
+            activePointerId = null;
+            knobEl.style.transform = 'translate(0px, 0px)';
+            moveStickVec = { x: 0, y: 0, active: false };
+          }
+        };
+        window.addEventListener('pointerup', resetStick);
+        window.addEventListener('pointercancel', resetStick);
+      }
+      bindVirtualStick(document.getElementById('moveStickZone'), document.getElementById('moveStickKnob'));
+      bindVirtualStick(document.getElementById('fsStickZone'), document.getElementById('fsStickKnob'));
 
       // ==========================================
       // 6. 랭킹 / 로그인 / VIP / 바로가기 / 토스트
