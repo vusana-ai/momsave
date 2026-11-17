@@ -157,44 +157,51 @@
       </div>
     </section>
 
-    <!-- 무기 선택 바 (전 무기 무제한) -->
-    <section class="grid grid-cols-4 gap-1.5 sm:gap-2">
-      <button type="button" data-weapon="0" class="weapon-slot-btn rounded-xl p-2 border-2 border-amber-400 bg-slate-900 text-left transition cursor-pointer">
-        <div class="flex items-center justify-between text-[10px] font-black text-amber-300"><span>[1] 헤비머신건</span><span>∞</span></div>
-        <div class="text-xs font-extrabold text-white truncate mt-0.5">🔫 연사총</div>
-      </button>
-      <button type="button" data-weapon="1" class="weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer">
-        <div class="flex items-center justify-between text-[10px] font-black text-orange-300"><span>[2] 로켓런처</span><span>∞</span></div>
-        <div class="text-xs font-extrabold text-slate-200 truncate mt-0.5">💣 미사일</div>
-      </button>
-      <button type="button" data-weapon="2" class="weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer">
-        <div class="flex items-center justify-between text-[10px] font-black text-sky-300"><span>[3] 레이저건</span><span>∞</span></div>
-        <div class="text-xs font-extrabold text-slate-200 truncate mt-0.5">⚡ 관통빔</div>
-      </button>
-      <button type="button" data-weapon="3" class="weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer">
-        <div class="flex items-center justify-between text-[10px] font-black text-rose-300"><span>[4] 플레임샷</span><span>∞</span></div>
-        <div class="text-xs font-extrabold text-slate-200 truncate mt-0.5">🔥 화염포</div>
-      </button>
-    </section>
-
-    <!-- 모바일 전용 외부 컨트롤 패드 -->
-    <section aria-label="모바일 조작 패드" class="sm:hidden bg-slate-900/95 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-2 select-none">
-      <div class="grid grid-cols-3 gap-1 w-[148px]">
-        <div></div>
-        <button id="mobJumpBtn" type="button" style="touch-action:none" class="h-11 rounded-xl bg-sky-600/90 active:bg-sky-500 border border-sky-300/60 text-base font-black text-white flex items-center justify-center shadow">▲</button>
-        <div></div>
-        <button id="mobLeftBtn" type="button" style="touch-action:none" class="h-12 rounded-xl bg-slate-950 border-2 border-slate-700 active:border-amber-400 active:bg-slate-800 text-lg font-black text-slate-200 flex items-center justify-center shadow">◀</button>
-        <div class="h-12 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-center text-[10px] text-slate-500 font-bold">이동</div>
-        <button id="mobRightBtn" type="button" style="touch-action:none" class="h-12 rounded-xl bg-slate-950 border-2 border-slate-700 active:border-amber-400 active:bg-slate-800 text-lg font-black text-slate-200 flex items-center justify-center shadow">▶</button>
+    <!-- 외부 컨트롤 패드 (게임 화면 아래쪽: 좌측 O형 조이스틱 / 우측 위 무기선택 4개 + 아래 미사일 버튼) -->
+    <section aria-label="게임 조작 패드" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3 select-none shadow-xl">
+      <!-- 좌측: O형 조이스틱 -->
+      <div class="flex flex-col items-center gap-1.5 shrink-0">
+        <div id="moveStickZone" style="touch-action:none" class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-950 border-2 border-sky-500/50 shadow-inner flex items-center justify-center cursor-pointer">
+          <div class="absolute inset-2 rounded-full border border-dashed border-slate-700/80 pointer-events-none"></div>
+          <span class="absolute top-1.5 left-1/2 -translate-x-1/2 text-[10px] font-black text-sky-400/80 pointer-events-none">▲ 점프</span>
+          <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 pointer-events-none">◀</span>
+          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 pointer-events-none">▶</span>
+          <div id="moveStickKnob" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-xs font-black text-slate-950">
+            🕹️
+          </div>
+        </div>
       </div>
 
-      <div class="flex flex-col gap-1.5 flex-1 max-w-[96px]">
-        <button id="mobDashBtn" type="button" style="touch-action:none" class="w-full py-2.5 rounded-xl bg-amber-500/90 active:bg-amber-400 border border-amber-200/70 text-xs font-black text-slate-950 shadow">⚡ 대시</button>
-        <button id="mobSwapBtn" type="button" style="touch-action:manipulation" class="w-full py-2 rounded-xl bg-slate-800 active:bg-slate-700 border border-slate-600 text-[11px] font-extrabold text-amber-300">🔄 무기</button>
-      </div>
+      <!-- 우측: 위쪽 무기선택 4개 + 아래쪽 미사일 버튼 -->
+      <div class="flex flex-col items-end gap-2.5 flex-1 min-w-0">
+        <div class="grid grid-cols-4 gap-1.5 w-full max-w-md">
+          <button type="button" data-weapon="0" class="weapon-slot-btn rounded-xl px-1.5 py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow">
+            <div class="text-sm sm:text-base leading-none">🔫</div>
+            <div class="text-[10px] font-black text-amber-300 truncate mt-1">[1] 연사총</div>
+          </button>
+          <button type="button" data-weapon="1" class="weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-sm sm:text-base leading-none">💣</div>
+            <div class="text-[10px] font-black text-orange-300 truncate mt-1">[2] 미사일</div>
+          </button>
+          <button type="button" data-weapon="2" class="weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-sm sm:text-base leading-none">⚡</div>
+            <div class="text-[10px] font-black text-sky-300 truncate mt-1">[3] 관통빔</div>
+          </button>
+          <button type="button" data-weapon="3" class="weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80">
+            <div class="text-sm sm:text-base leading-none">🔥</div>
+            <div class="text-[10px] font-black text-rose-300 truncate mt-1">[4] 화염포</div>
+          </button>
+        </div>
 
-      <div id="aimStickZone" class="relative w-20 h-20 rounded-full bg-slate-950 border-2 border-amber-500/50 flex items-center justify-center shrink-0 touch-none">
-        <div id="aimStickKnob" class="w-9 h-9 rounded-full bg-gradient-to-b from-amber-400 to-orange-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-[10px] font-black text-slate-950">🎯</div>
+        <div class="flex items-center justify-end gap-2.5 w-full max-w-md">
+          <button id="mobDashBtn" type="button" style="touch-action:none" class="px-4 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-amber-400/50 text-xs sm:text-sm font-black text-amber-300 shadow cursor-pointer transition">
+            ⚡ 대시
+          </button>
+          <button id="missileFireBtn" type="button" style="touch-action:none" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-orange-400 via-rose-500 to-red-600 hover:from-orange-300 hover:to-red-500 active:scale-95 border-2 border-amber-200/90 shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center text-white cursor-pointer transition shrink-0">
+            <span class="text-2xl sm:text-3xl leading-none">🚀</span>
+            <span class="text-[11px] sm:text-xs font-black mt-1">미사일</span>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -608,6 +615,7 @@
         dashTimer: 0,
         dashCd: 0,
         dashDir: 1,
+        facing: 1,
         walkCycle: 0
       };
 
@@ -620,15 +628,17 @@
 
       const keys = {};
       let isFiring = false;
+      let missileBtnHeld = false;
       let pointerScreen = { x: 460, y: 490 };
-      let aimStickVec = { x: 0, y: 0, active: false };
+      let moveStickVec = { x: 0, y: 0, active: false };
 
       function triggerDash() {
         if (!running || rescueSequence || player.dashCd > 0 || player.dashTimer > 0) return;
         let dir = 0;
         if (keys['KeyA'] || keys['ArrowLeft']) dir -= 1;
         if (keys['KeyD'] || keys['ArrowRight']) dir += 1;
-        if (dir === 0) dir = Math.cos(player.aimAngle) >= 0 ? 1 : -1;
+        if (dir === 0 && moveStickVec.active && Math.abs(moveStickVec.x) > 0.2) dir = moveStickVec.x > 0 ? 1 : -1;
+        if (dir === 0) dir = player.facing || (Math.cos(player.aimAngle) >= 0 ? 1 : -1);
 
         player.dashDir = dir;
         player.dashTimer = 0.22;
@@ -1051,6 +1061,11 @@
         let moveX = 0;
         if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
         if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+        if (moveStickVec.active && Math.abs(moveStickVec.x) > 0.18) {
+          moveX = Math.max(-1, Math.min(1, moveStickVec.x));
+        }
+        if (moveX > 0.05) player.facing = 1;
+        else if (moveX < -0.05) player.facing = -1;
 
         if (player.dashTimer > 0) {
           player.dashTimer -= dt;
@@ -1061,7 +1076,8 @@
           if (moveX !== 0) player.walkCycle += dt * 15;
         }
 
-        if ((keys['KeyW'] || keys['ArrowUp'] || keys['Space']) && player.grounded) {
+        const stickJump = moveStickVec.active && moveStickVec.y < -0.45;
+        if ((keys['KeyW'] || keys['ArrowUp'] || keys['Space'] || stickJump) && player.grounded) {
           player.vy = -650;
           player.grounded = false;
           spawnCartoonDust(player.x, player.y + player.h / 2, 5);
@@ -1101,8 +1117,9 @@
         const worldAimX = pointerScreen.x + camera.x;
         const worldAimY = pointerScreen.y + camera.y;
 
-        if (aimStickVec.active) {
-          player.aimAngle = Math.atan2(aimStickVec.y, aimStickVec.x);
+        if (missileBtnHeld) {
+          const dyAim = (moveStickVec.active && Math.abs(moveStickVec.y) > 0.25) ? moveStickVec.y * 0.45 : 0;
+          player.aimAngle = player.facing >= 0 ? dyAim : Math.PI - dyAim;
           fireWeapon();
         } else {
           player.aimAngle = Math.atan2(worldAimY - (player.y - 4), worldAimX - player.x);
@@ -1822,7 +1839,7 @@
         });
 
         // 조준 크로스헤어 & 텍스트
-        if (!aimStickVec.active && !rescueSequence) {
+        if (!missileBtnHeld && !rescueSequence) {
           const aimX = pointerScreen.x + camera.x;
           const aimY = pointerScreen.y + camera.y;
           ctx.save();
@@ -1915,9 +1932,9 @@
         document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
           const idx = Number(btn.dataset.weapon);
           if (idx === player.weaponIdx) {
-            btn.className = 'weapon-slot-btn rounded-xl p-2 border-2 border-amber-400 bg-slate-900 text-left transition cursor-pointer shadow';
+            btn.className = 'weapon-slot-btn rounded-xl px-1.5 py-2 border-2 border-amber-400 bg-slate-950 text-center transition cursor-pointer shadow';
           } else {
-            btn.className = 'weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer opacity-80';
+            btn.className = 'weapon-slot-btn rounded-xl px-1.5 py-2 border border-slate-800 bg-slate-950/70 text-center transition cursor-pointer opacity-80';
           }
         });
       }
@@ -1961,65 +1978,62 @@
         btn.addEventListener('click', () => selectWeapon(Number(btn.dataset.weapon)));
       });
 
-      function bindHoldKey(btnId, keyCode) {
-        const el = document.getElementById(btnId);
-        el.addEventListener('pointerdown', (e) => { e.preventDefault(); getAC(); keys[keyCode] = true; });
-        const rel = () => { keys[keyCode] = false; };
-        el.addEventListener('pointerup', rel);
-        el.addEventListener('pointercancel', rel);
-        el.addEventListener('pointerleave', rel);
-      }
-      bindHoldKey('mobLeftBtn', 'KeyA');
-      bindHoldKey('mobRightBtn', 'KeyD');
-      bindHoldKey('mobJumpBtn', 'KeyW');
-
       document.getElementById('mobDashBtn').addEventListener('pointerdown', (e) => {
         e.preventDefault();
         getAC();
         triggerDash();
       });
 
-      document.getElementById('mobSwapBtn').addEventListener('click', () => {
-        selectWeapon((player.weaponIdx + 1) % 4);
+      const missileFireBtn = document.getElementById('missileFireBtn');
+      missileFireBtn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        getAC();
+        missileBtnHeld = true;
       });
+      const releaseMissileBtn = () => { missileBtnHeld = false; };
+      missileFireBtn.addEventListener('pointerup', releaseMissileBtn);
+      missileFireBtn.addEventListener('pointercancel', releaseMissileBtn);
+      missileFireBtn.addEventListener('pointerleave', releaseMissileBtn);
 
-      const aimZone = document.getElementById('aimStickZone');
-      const aimKnob = document.getElementById('aimStickKnob');
-      let aimPointerId = null;
+      const moveZone = document.getElementById('moveStickZone');
+      const moveKnob = document.getElementById('moveStickKnob');
+      let movePointerId = null;
 
-      function updateAimStick(cx, cy) {
-        const rect = aimZone.getBoundingClientRect();
+      function updateMoveStick(cx, cy) {
+        const rect = moveZone.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         const dx = cx - centerX;
         const dy = cy - centerY;
-        const maxR = rect.width / 2 - 12;
+        const maxR = rect.width / 2 - 22;
         const dist = Math.hypot(dx, dy);
         const clamped = Math.min(dist, maxR);
         const ang = Math.atan2(dy, dx);
-        aimKnob.style.transform = `translate(${Math.cos(ang) * clamped}px, ${Math.sin(ang) * clamped}px)`;
-        aimStickVec = { x: Math.cos(ang), y: Math.sin(ang), active: true };
+        moveKnob.style.transform = `translate(${Math.cos(ang) * clamped}px, ${Math.sin(ang) * clamped}px)`;
+        const nx = maxR > 0 ? (Math.cos(ang) * clamped) / maxR : 0;
+        const ny = maxR > 0 ? (Math.sin(ang) * clamped) / maxR : 0;
+        moveStickVec = { x: nx, y: ny, active: true };
       }
 
-      aimZone.addEventListener('pointerdown', (e) => {
+      moveZone.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         getAC();
-        aimPointerId = e.pointerId;
-        if (aimZone.setPointerCapture) try { aimZone.setPointerCapture(e.pointerId); } catch {}
-        updateAimStick(e.clientX, e.clientY);
+        movePointerId = e.pointerId;
+        if (moveZone.setPointerCapture) try { moveZone.setPointerCapture(e.pointerId); } catch {}
+        updateMoveStick(e.clientX, e.clientY);
       });
       window.addEventListener('pointermove', (e) => {
-        if (aimPointerId !== null && e.pointerId === aimPointerId) updateAimStick(e.clientX, e.clientY);
+        if (movePointerId !== null && e.pointerId === movePointerId) updateMoveStick(e.clientX, e.clientY);
       });
-      const resetAimStick = (e) => {
-        if (aimPointerId !== null && e.pointerId === aimPointerId) {
-          aimPointerId = null;
-          aimKnob.style.transform = 'translate(0px, 0px)';
-          aimStickVec.active = false;
+      const resetMoveStick = (e) => {
+        if (movePointerId !== null && e.pointerId === movePointerId) {
+          movePointerId = null;
+          moveKnob.style.transform = 'translate(0px, 0px)';
+          moveStickVec = { x: 0, y: 0, active: false };
         }
       };
-      window.addEventListener('pointerup', resetAimStick);
-      window.addEventListener('pointercancel', resetAimStick);
+      window.addEventListener('pointerup', resetMoveStick);
+      window.addEventListener('pointercancel', resetMoveStick);
 
       // ==========================================
       // 6. 랭킹 / 로그인 / VIP / 바로가기 / 토스트
