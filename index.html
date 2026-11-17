@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#090d16" />
+  <link rel="manifest" href="./manifest.json" />
+  <title>엄마 구하기 — 외계인 침공 2D 액션</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+    canvas {
+      touch-action: none;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.7); border-radius: 9999px; }
+    @keyframes goldShine {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.45)); }
+      50% { filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.85)); }
+    }
+    .gold-bar-glow { animation: goldShine 2.4s infinite ease-in-out; }
+    @keyframes vipPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(168, 85, 247, 0.45); }
+      50% { box-shadow: 0 0 15px rgba(232, 121, 249, 0.8); }
+    }
+    .vip-btn-glow { animation: vipPulse 2.2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur px-4 py-2.5 sticky top-0 z-30 shadow-lg shadow-black/30">
+    <div class="max-w-5xl mx-auto flex flex-col gap-2">
+      <!-- 1단 -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0 flex-wrap">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-rose-400/25 to-amber-600/25 text-amber-300 font-extrabold text-sm border border-amber-500/40 shadow-inner shrink-0">🛸</span>
+          <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-slate-50 shrink-0">엄마 구하기 <span class="text-amber-400">: 외계인 침공</span></h1>
+
+          <span id="userBadge" class="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-slate-800 border border-slate-700 text-slate-300 shrink-0">
+            👤 게스트
+          </span>
+
+          <button id="vipOpenBtn" type="button" title="VIP 특전 보기"
+            class="vip-btn-glow px-2.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-black bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white border border-amber-300/80 transition active:scale-95 flex items-center gap-1 cursor-pointer shrink-0">
+            <span>👑</span>
+            <span id="vipHeaderBtnLabel">VIP</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-amber-500/15 border border-amber-500/40 text-amber-300 flex items-center gap-1 shadow-sm">
+            <span>🏆</span>
+            <span id="highScoreDisplay">0</span>
+          </div>
+
+          <button id="serverSaveGoldBtn" type="button" title="클릭하여 서버 로그인 및 데이터 영구 저장"
+            class="group px-2.5 sm:px-3 py-1 rounded-xl text-xs font-black bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 hover:from-yellow-200 hover:via-amber-300 hover:to-amber-500 text-slate-950 border border-yellow-200/80 shadow-md shadow-amber-500/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 shrink-0 gold-bar-glow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5.5 7.5L8.5 5H15.5L18.5 7.5L21 17.5H3L5.5 7.5Z" fill="#78350F" stroke="#451A03" stroke-width="1.4" stroke-linejoin="round"/>
+              <path d="M8.5 5H15.5L17 9.5H7L8.5 5Z" fill="#FEF08A"/>
+              <path d="M7 9.5H17L19.2 16.5H4.8L7 9.5Z" fill="#F59E0B"/>
+              <path d="M8.8 6.2H15.2L16.1 8.6H7.9L8.8 6.2Z" fill="#FFFFFF" fill-opacity="0.55"/>
+            </svg>
+            <span id="serverSaveBtnLabel">로그인</span>
+          </button>
+
+          <button id="logoutBtn" type="button" class="hidden px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition active:scale-95 cursor-pointer">
+            로그아웃
+          </button>
+        </div>
+      </div>
+
+      <!-- 2단 -->
+      <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-800/70">
+        <p id="syncStatusText" class="text-[11px] text-slate-400 truncate">
+          로그인 시 최고 점수가 랭킹에 자동 등록됩니다
+        </p>
+        <div class="flex items-center gap-1.5 shrink-0 ml-auto">
+          <button id="bgmToggleBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-indigo-950/80 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-200 transition active:scale-95 cursor-pointer">
+            🎵 배경음 ON
+          </button>
+          <button id="soundToggleBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition active:scale-95 cursor-pointer">
+            🔊 효과음 ON
+          </button>
+          <button id="resetOpenBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-rose-950/70 hover:text-rose-300 border border-slate-700 hover:border-rose-700/60 text-slate-300 transition active:scale-95 cursor-pointer">
+            초기화
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col gap-3.5">
+    <!-- 상단 전투 HUD 카드 -->
+    <section class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+      <div class="col-span-2 sm:col-span-2 bg-slate-900/90 border border-amber-500/35 rounded-xl px-3 py-2 flex items-center justify-between">
+        <div>
+          <div class="text-[10px] text-amber-300/90 font-bold">🛸 현재 점수 · 구역</div>
+          <div class="flex items-baseline gap-2">
+            <span id="scoreDisplay" class="text-base sm:text-lg font-black text-amber-400 tabular-nums">0</span>
+            <span id="waveDisplay" class="text-xs font-extrabold text-emerald-300">STAGE 1 · 학교</span>
+          </div>
+        </div>
+        <button id="startActionBtn" type="button" class="px-3.5 py-2 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 cursor-pointer active:scale-95 transition shadow">
+          작전 개시
+        </button>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 flex flex-col justify-center">
+        <div class="flex items-center justify-between text-[10px] text-slate-400">
+          <span>체력</span>
+          <span id="hpText" class="font-bold text-emerald-300">100/100</span>
+        </div>
+        <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800 mt-1">
+          <div id="hpBar" class="h-full bg-gradient-to-r from-emerald-500 to-lime-400 transition-all duration-100" style="width:100%"></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 flex flex-col justify-center">
+        <div class="text-[10px] text-slate-400">장착 무기</div>
+        <div id="weaponDisplay" class="text-xs sm:text-sm font-black text-amber-300 truncate mt-0.5">🔫 헤비 머신건</div>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1 bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 flex items-center sm:flex-col sm:items-start justify-between sm:justify-center">
+        <div class="text-[10px] text-slate-400">남은 탄약</div>
+        <div id="ammoDisplay" class="text-xs sm:text-sm font-extrabold text-sky-300 tabular-nums mt-0.5">∞ 무제한</div>
+      </div>
+    </section>
+
+    <!-- 게임 캔버스 영역 -->
+    <section class="relative bg-slate-950 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-black/60">
+      <div id="canvasWrapper" class="relative w-full aspect-[16/9] sm:aspect-[2/1] min-h-[260px] max-h-[520px] bg-slate-900 cursor-crosshair">
+        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+
+        <!-- 시작 / 게임오버 / 클리어 오버레이 -->
+        <div id="gameOverlay" class="absolute inset-0 z-20 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center">
+          <div id="overlayIcon" class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-4xl mb-3 shadow-lg">🛸</div>
+          <h2 id="overlayTitle" class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">엄마 구하기</h2>
+          <p id="overlaySub" class="text-xs sm:text-sm text-slate-300 max-w-md mt-2 leading-relaxed">
+            학교를 탈출해 외계인에게 납치된 엄마를 구출하라!
+          </p>
+          <button id="overlayStartBtn" type="button" class="mt-6 px-9 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 active:scale-95 transition cursor-pointer">
+            ▶ 구출 작전 시작
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 무기 선택 바 (전 무기 무제한) -->
+    <section class="grid grid-cols-4 gap-1.5 sm:gap-2">
+      <button type="button" data-weapon="0" class="weapon-slot-btn rounded-xl p-2 border-2 border-amber-400 bg-slate-900 text-left transition cursor-pointer">
+        <div class="flex items-center justify-between text-[10px] font-black text-amber-300"><span>[1] 헤비머신건</span><span>∞</span></div>
+        <div class="text-xs font-extrabold text-white truncate mt-0.5">🔫 연사총</div>
+      </button>
+      <button type="button" data-weapon="1" class="weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer">
+        <div class="flex items-center justify-between text-[10px] font-black text-orange-300"><span>[2] 로켓런처</span><span>∞</span></div>
+        <div class="text-xs font-extrabold text-slate-200 truncate mt-0.5">💣 미사일</div>
+      </button>
+      <button type="button" data-weapon="2" class="weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer">
+        <div class="flex items-center justify-between text-[10px] font-black text-sky-300"><span>[3] 레이저건</span><span>∞</span></div>
+        <div class="text-xs font-extrabold text-slate-200 truncate mt-0.5">⚡ 관통빔</div>
+      </button>
+      <button type="button" data-weapon="3" class="weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer">
+        <div class="flex items-center justify-between text-[10px] font-black text-rose-300"><span>[4] 플레임샷</span><span>∞</span></div>
+        <div class="text-xs font-extrabold text-slate-200 truncate mt-0.5">🔥 화염포</div>
+      </button>
+    </section>
+
+    <!-- 모바일 전용 외부 컨트롤 패드 -->
+    <section aria-label="모바일 조작 패드" class="sm:hidden bg-slate-900/95 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-2 select-none">
+      <div class="grid grid-cols-3 gap-1 w-[148px]">
+        <div></div>
+        <button id="mobJumpBtn" type="button" style="touch-action:none" class="h-11 rounded-xl bg-sky-600/90 active:bg-sky-500 border border-sky-300/60 text-base font-black text-white flex items-center justify-center shadow">▲</button>
+        <div></div>
+        <button id="mobLeftBtn" type="button" style="touch-action:none" class="h-12 rounded-xl bg-slate-950 border-2 border-slate-700 active:border-amber-400 active:bg-slate-800 text-lg font-black text-slate-200 flex items-center justify-center shadow">◀</button>
+        <div class="h-12 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-center text-[10px] text-slate-500 font-bold">이동</div>
+        <button id="mobRightBtn" type="button" style="touch-action:none" class="h-12 rounded-xl bg-slate-950 border-2 border-slate-700 active:border-amber-400 active:bg-slate-800 text-lg font-black text-slate-200 flex items-center justify-center shadow">▶</button>
+      </div>
+
+      <div class="flex flex-col gap-1.5 flex-1 max-w-[96px]">
+        <button id="mobDashBtn" type="button" style="touch-action:none" class="w-full py-2.5 rounded-xl bg-amber-500/90 active:bg-amber-400 border border-amber-200/70 text-xs font-black text-slate-950 shadow">⚡ 대시</button>
+        <button id="mobSwapBtn" type="button" style="touch-action:manipulation" class="w-full py-2 rounded-xl bg-slate-800 active:bg-slate-700 border border-slate-600 text-[11px] font-extrabold text-amber-300">🔄 무기</button>
+      </div>
+
+      <div id="aimStickZone" class="relative w-20 h-20 rounded-full bg-slate-950 border-2 border-amber-500/50 flex items-center justify-center shrink-0 touch-none">
+        <div id="aimStickKnob" class="w-9 h-9 rounded-full bg-gradient-to-b from-amber-400 to-orange-600 border-2 border-white/80 shadow-lg pointer-events-none flex items-center justify-center text-[10px] font-black text-slate-950">🎯</div>
+      </div>
+    </section>
+
+    <!-- 명예의 전당 -->
+    <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-col gap-2.5 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs sm:text-sm font-extrabold text-amber-300">🏆 엄마 구하기 명예의 전당</div>
+          <div class="text-[10px] text-slate-400">최고 구출 점수 기준 통합 순위</div>
+        </div>
+        <button id="refreshRankingBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 cursor-pointer">🔄 새로고침</button>
+      </div>
+      <div class="rounded-xl border border-amber-500/25 px-3 py-2 flex justify-between text-xs bg-slate-950/85">
+        <span class="text-slate-400 font-semibold">내 현재 순위</span>
+        <span id="myRankDetailText" class="font-extrabold text-amber-300">로그인 시 실시간 순위에 등록됩니다</span>
+      </div>
+      <div id="rankingListContainer" class="flex flex-col gap-1.5 max-h-[240px] overflow-y-auto pr-1"></div>
+    </section>
+
+    <!-- 바로가기 만들기 카드 -->
+    <section class="bg-gradient-to-br from-slate-900 to-amber-950/30 border border-amber-500/35 rounded-2xl p-3.5 shadow-xl mb-4">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-lg shrink-0">🛸</div>
+          <div class="text-sm font-black text-amber-300 truncate">엄마 구하기 바로가기</div>
+        </div>
+        <button id="androidInstallBtn" type="button" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-black text-xs sm:text-sm shadow-md transition shrink-0 cursor-pointer">
+          <span id="androidInstallBtnText">아이콘 만들기</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast -->
+  <div id="toastBox" class="pointer-events-none fixed bottom-5 left-1/2 -translate-x-1/2 z-50 opacity-0 transition-all duration-200 translate-y-2">
+    <div id="toastMsg" class="px-4 py-2 rounded-xl bg-slate-900/95 border border-amber-500/50 text-xs sm:text-sm font-bold text-amber-200 shadow-2xl">알림</div>
+  </div>
+
+  <!-- VIP 모달 -->
+  <div id="vipModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-slate-900 border-2 border-purple-500/60 rounded-2xl max-w-lg w-full my-auto shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 px-5 py-4 border-b border-purple-500/30 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/50 flex items-center justify-center text-xl">👑</span>
+          <div>
+            <h2 class="text-base sm:text-lg font-black text-amber-300">엄마 구하기 VIP 패키지</h2>
+            <p class="text-[11px] text-slate-300">최대 체력 200 + 구출 점수 영구 2배 보너스</p>
+          </div>
+        </div>
+        <button id="vipCloseBtn" type="button" class="text-slate-400 hover:text-white text-base font-bold px-2.5 py-1 rounded-lg hover:bg-slate-800 cursor-pointer">✕</button>
+      </div>
+      <div class="p-4 sm:p-5 flex flex-col gap-4">
+        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3.5 text-xs flex flex-col gap-2">
+          <div class="font-bold text-slate-200">🛡️ 전투 체력 200 적용 (기본 100)</div>
+          <div class="font-bold text-slate-200">🏆 획득 구출 점수 영구 2배 보너스</div>
+          <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400 font-bold">결제 금액</span>
+            <span class="text-lg font-black text-amber-400">7,000원</span>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl overflow-hidden border border-slate-300">
+          <div id="tossWidgetLoading" class="py-6 text-center text-xs font-bold text-slate-500">결제창 불러오는 중...</div>
+          <div id="toss-payment-method"></div>
+          <div id="toss-agreement"></div>
+        </div>
+        <button id="vipPaySubmitBtn" type="button" disabled class="w-full py-3 rounded-xl bg-amber-400 disabled:bg-slate-700 disabled:text-slate-400 text-slate-950 font-black text-sm cursor-pointer">
+          💳 7,000원 결제하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 로그인 모달 -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-amber-500/40 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-base font-extrabold text-amber-300">🟨 서버 저장 계정</h2>
+        <button id="authCloseBtn" type="button" class="text-slate-400 hover:text-slate-200 text-sm font-bold px-2 py-1 cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">휴대폰 번호 뒷 8자리와 숫자 비밀번호 4자리로 전적을 서버에 영구 저장하세요.</p>
+      <div class="flex rounded-xl bg-slate-950 p-1 border border-slate-800 mb-4">
+        <button id="modeLoginBtn" type="button" class="flex-1 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 cursor-pointer">기존 계정 로그인</button>
+        <button id="modeRegisterBtn" type="button" class="flex-1 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 cursor-pointer">간편 회원가입</button>
+      </div>
+      <form id="authForm" class="flex flex-col gap-3.5">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-1">아이디 (휴대폰 번호 뒷 8자리)</label>
+          <div class="flex items-center rounded-xl bg-slate-950 border border-slate-700 overflow-hidden">
+            <span class="px-3 py-2 bg-slate-900 text-amber-300 font-extrabold text-sm border-r border-slate-800">010 -</span>
+            <input id="authPhoneDigits" type="tel" inputmode="numeric" maxlength="9" required placeholder="1234-5678" class="w-full px-3 py-2 bg-transparent text-sm font-bold text-slate-100 focus:outline-none" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-1">비밀번호 (숫자 4자리)</label>
+          <input id="authPinCode" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" required placeholder="1234" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-bold tracking-[0.35em] text-slate-100 focus:outline-none" />
+        </div>
+        <div id="authErrorMsg" class="hidden text-xs text-rose-400 font-semibold bg-rose-950/40 border border-rose-800/50 rounded-lg px-3 py-2"></div>
+        <button id="authSubmitBtn" type="submit" class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-black bg-amber-500 hover:bg-amber-400 text-slate-950 shadow cursor-pointer">로그인 및 서버저장 연동</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 초기화 모달 -->
+  <div id="resetModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+      <h2 class="text-base font-extrabold text-slate-100 mb-1.5">게임 초기화</h2>
+      <p class="text-xs text-slate-400 mb-4">로컬 최고 기록을 초기화하고 처음부터 다시 시작할까요?</p>
+      <div class="flex justify-end gap-2">
+        <button id="resetCancelBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 cursor-pointer">취소</button>
+        <button id="resetConfirmBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white cursor-pointer">초기화하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // ==========================================
+      // 1. 서버 연동 & 상태 관리
+      // ==========================================
+      const GAME_ID = 'rescue_mom_v1';
+      const CLOUD_API_URL = 'https://02826k.duckdns.org';
+      const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const API_BASE_URL = isLocalHost ? '' : CLOUD_API_URL;
+      const TOSS_CLIENT_KEY = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
+      const VIP_PRICE = 7000;
+
+      const STORAGE_KEY = 'rescue_mom_save_v1';
+      const TOKEN_KEY = 'abuse_jwt_token';
+      const USER_KEY = 'abuse_username';
+
+      let authToken = localStorage.getItem(TOKEN_KEY) || null;
+      let currentUsername = localStorage.getItem(USER_KEY) || null;
+      let isRegisterMode = false;
+
+      let state = {
+        highScore: 0,
+        bestSector: 1,
+        soundEnabled: true,
+        bgmEnabled: true,
+        isVip: false
+      };
+
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') state = { ...state, ...parsed };
+        }
+      } catch (e) {}
+
+      function saveState(sync = false) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        if (sync && authToken) syncSaveToServer(false);
+      }
+
+      function maskPhoneMiddle(name) {
+        const str = String(name || '');
+        const m = str.match(/^(01[016789])[-.\s]?(\d{3,4}|\*{3,4})[-.\s]?(\d{4}|\*{4})$/);
+        if (m) return `${m[1]}-****-${m[3]}`;
+        return str.replace(/(01[016789])[-.\s]?(\d{3,4})[-.\s]?(\d{4})/g, '$1-****-$3');
+      }
+
+      async function syncSaveToServer(notify = false) {
+        if (!authToken) return;
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+            body: JSON.stringify({
+              gameId: GAME_ID,
+              saveData: state,
+              score: state.highScore,
+              bestSector: state.bestSector
+            })
+          });
+          if (res.status === 401 || res.status === 403) { handleLogout(true); return; }
+          if (res.ok) {
+            if (notify) showToast('🟨 클라우드 서버에 기록이 저장되었습니다!');
+            fetchRanking();
+          }
+        } catch (e) {}
+      }
+
+      async function loadFromServer() {
+        if (!authToken) return;
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/load?gameId=${GAME_ID}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (res.status === 401 || res.status === 403) { handleLogout(true); return; }
+          const data = await res.json();
+          if (res.ok && data.saveData) {
+            const sd = typeof data.saveData === 'string' ? JSON.parse(data.saveData) : data.saveData;
+            state.highScore = Math.max(state.highScore, Number(sd.highScore || 0));
+            state.bestSector = Math.max(state.bestSector, Number(sd.bestSector || 1));
+            state.isVip = Boolean(data.isVip || sd.isVip || state.isVip);
+            saveState(false);
+            updateHeaderUI();
+          }
+        } catch (e) {}
+      }
+
+      // ==========================================
+      // 2. Web Audio 아케이드 BGM & 효과음
+      // ==========================================
+      let audioCtx = null;
+      let bgmTimer = null;
+      let bgmStep = 0;
+
+      function getAC() {
+        if (!state.soundEnabled && !state.bgmEnabled) return null;
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        return audioCtx;
+      }
+
+      function playSfx(type) {
+        if (!state.soundEnabled) return;
+        const ctxA = getAC();
+        if (!ctxA) return;
+        const now = ctxA.currentTime;
+        const osc = ctxA.createOscillator();
+        const gain = ctxA.createGain();
+        osc.connect(gain);
+        gain.connect(ctxA.destination);
+
+        if (type === 'laser') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(640, now);
+          osc.frequency.exponentialRampToValueAtTime(160, now + 0.07);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now); osc.stop(now + 0.08);
+        } else if (type === 'grenade') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.14);
+          gain.gain.setValueAtTime(0.13, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'boom') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(135, now);
+          osc.frequency.exponentialRampToValueAtTime(28, now + 0.3);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+          osc.start(now); osc.stop(now + 0.32);
+        } else if (type === 'plasma') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(1040, now + 0.07);
+          osc.frequency.exponentialRampToValueAtTime(220, now + 0.14);
+          gain.gain.setValueAtTime(0.11, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'flame') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160 + Math.random() * 60, now);
+          osc.frequency.exponentialRampToValueAtTime(55, now + 0.07);
+          gain.gain.setValueAtTime(0.07, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now); osc.stop(now + 0.08);
+        } else if (type === 'dash') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.exponentialRampToValueAtTime(580, now + 0.11);
+          gain.gain.setValueAtTime(0.11, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now); osc.stop(now + 0.12);
+        } else if (type === 'portal') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(980, now + 0.35);
+          gain.gain.setValueAtTime(0.16, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+          osc.start(now); osc.stop(now + 0.38);
+        } else if (type === 'clear') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.14);
+          osc.frequency.setValueAtTime(783.99, now + 0.28);
+          osc.frequency.setValueAtTime(1046.5, now + 0.42);
+          gain.gain.setValueAtTime(0.16, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+          osc.start(now); osc.stop(now + 0.86);
+        } else if (type === 'pickup') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(660, now);
+          osc.frequency.setValueAtTime(1040, now + 0.06);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          osc.start(now); osc.stop(now + 0.17);
+        }
+      }
+
+      function startBGM() {
+        stopBGM();
+        if (!state.bgmEnabled) return;
+        const ctxA = getAC();
+        if (!ctxA) return;
+        const riff = [146.83, 146.83, 174.61, 196.0, 220.0, 196.0, 174.61, 130.81];
+        bgmTimer = setInterval(() => {
+          if (!state.bgmEnabled || !audioCtx) return;
+          try {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(riff[bgmStep % riff.length], now);
+            g.gain.setValueAtTime(0.024, now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.24);
+            bgmStep++;
+          } catch (e) {}
+        }, 240);
+      }
+
+      function stopBGM() {
+        if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; }
+      }
+
+      // ==========================================
+      // 3. 4개 섹터 월드 (1:학교 -> 2:지하철 -> 3:도시 -> 4:엄마회사)
+      // ==========================================
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const canvasWrapper = document.getElementById('canvasWrapper');
+
+      const CAM_W = 1280;
+      const CAM_H = 640;
+      const MAP_W = 6400;
+      const MAP_H = 640;
+      const GRAVITY = 1480;
+
+      let viewW = 960;
+      let viewH = 480;
+      const camera = { x: 0, y: 0 };
+
+      const SECTOR_INFO = {
+        1: { title: 'STAGE 1 · 학교 교실', nextLabel: '지하철역으로', bossName: '👨‍🦲 외계 빙의 대머리 교장', bossHp: 850 },
+        2: { title: 'STAGE 2 · 지하철역', nextLabel: '도심 외곽으로', bossName: '🤖 외계인 역장 메카', bossHp: 1150 },
+        3: { title: 'STAGE 3 · 침공된 도시', nextLabel: '엄마 회사로', bossName: '👾 외계 돌격 사령관', bossHp: 1450 },
+        4: { title: 'STAGE 4 · 엄마 회사', nextLabel: '엄마 구출', bossName: '👽 외계인 대장 보스', bossHp: 1850 }
+      };
+
+      function resizeCanvas() {
+        const rect = canvasWrapper.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        viewW = Math.max(320, rect.width || 960);
+        viewH = Math.max(220, rect.height || 480);
+        canvas.width = Math.floor(viewW * dpr);
+        canvas.height = Math.floor(viewH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener('resize', resizeCanvas);
+
+      let PLATFORMS = [];
+      function buildStagePlatforms(stageNum) {
+        const list = [{ x: 0, y: 576, w: MAP_W, h: 64, style: 'ground' }];
+        for (let sec = 0; sec < 4; sec++) {
+          const base = sec * 1280;
+          list.push(
+            { x: base + 220, y: 452, w: 280, h: 22, style: `plat_low_${stageNum}` },
+            { x: base + 460, y: 315, w: 260, h: 22, style: `plat_high_${stageNum}` },
+            { x: base + 780, y: 425, w: 310, h: 22, style: `plat_low_${stageNum}` },
+            { x: base + 1010, y: 265, w: 230, h: 22, style: `plat_high_${stageNum}` }
+          );
+        }
+        return list;
+      }
+
+      const WEAPON_DEFS = [
+        { id: 0, name: '헤비 머신건', icon: '🔫', cd: 0.12, color: '#fbbf24', sfx: 'laser' },
+        { id: 1, name: '로켓 런처', icon: '💣', cd: 0.50, color: '#f97316', sfx: 'grenade' },
+        { id: 2, name: '레이저 건', icon: '⚡', cd: 0.25, color: '#38bdf8', sfx: 'plasma' },
+        { id: 3, name: '플레임 샷', icon: '🔥', cd: 0.06, color: '#ef4444', sfx: 'flame' }
+      ];
+
+      let running = false;
+      let score = 0;
+      let sector = 1;
+      let spawnTimer = 0;
+      let screenShake = 0;
+
+      const portal = { x: 6220, y: 506, w: 72, h: 132, unlocked: false };
+      let boss = null;
+      const mom = {
+        x: 6220, y: 532,
+        rescued: false,
+        cageBroken: false,
+        hugged: false,
+        jumpPhase: 0
+      };
+      let rescueSequence = false;
+      let rescueTimer = 0;
+
+      const player = {
+        x: 220, y: 510, vx: 0, vy: 0,
+        w: 34, h: 48,
+        hp: 100, maxHp: 100,
+        grounded: false,
+        aimAngle: 0,
+        weaponIdx: 0,
+        fireCd: 0,
+        recoil: 0,
+        invuln: 0,
+        dashTimer: 0,
+        dashCd: 0,
+        dashDir: 1,
+        walkCycle: 0
+      };
+
+      let bullets = [];
+      let enemyBullets = [];
+      let enemies = [];
+      let pickups = [];
+      let particles = [];
+      let floatingTexts = [];
+
+      const keys = {};
+      let isFiring = false;
+      let pointerScreen = { x: 460, y: 490 };
+      let aimStickVec = { x: 0, y: 0, active: false };
+
+      function triggerDash() {
+        if (!running || rescueSequence || player.dashCd > 0 || player.dashTimer > 0) return;
+        let dir = 0;
+        if (keys['KeyA'] || keys['ArrowLeft']) dir -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) dir += 1;
+        if (dir === 0) dir = Math.cos(player.aimAngle) >= 0 ? 1 : -1;
+
+        player.dashDir = dir;
+        player.dashTimer = 0.22;
+        player.dashCd = 0.72;
+        player.invuln = Math.max(player.invuln, 0.28);
+        playSfx('dash');
+        spawnCartoonDust(player.x, player.y + player.h / 2, 7);
+      }
+
+      function spawnCartoonDust(x, y, count = 5) {
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            kind: 'smoke',
+            x: x + (Math.random() - 0.5) * 16,
+            y: y - Math.random() * 6,
+            vx: (Math.random() - 0.5) * 120,
+            vy: -25 - Math.random() * 60,
+            life: 0.35 + Math.random() * 0.15,
+            maxLife: 0.5,
+            color: '#e2e8f0',
+            size: 7 + Math.random() * 6
+          });
+        }
+      }
+
+      // 순수 시각 폭발 이펙트 (게임 루프 멈춤 방지를 위해 피해 판정과 분리)
+      function spawnVisualExplosion(x, y) {
+        playSfx('boom');
+        screenShake = Math.max(screenShake, 10);
+        for (let i = 0; i < 16; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const sp = 60 + Math.random() * 240;
+          particles.push({
+            kind: i % 3 === 0 ? 'smoke' : 'spark',
+            x: x + (Math.random() - 0.5) * 20,
+            y: y + (Math.random() - 0.5) * 20,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp - 40,
+            life: 0.45 + Math.random() * 0.15,
+            maxLife: 0.6,
+            color: i % 3 === 0 ? '#475569' : (i % 2 === 0 ? '#facc15' : '#f97316'),
+            size: i % 3 === 0 ? 14 + Math.random() * 8 : 7 + Math.random() * 5
+          });
+        }
+      }
+
+      function setupSector(stageNum) {
+        sector = stageNum;
+        PLATFORMS = buildStagePlatforms(stageNum);
+        bullets = [];
+        enemyBullets = [];
+        enemies = [];
+        pickups = [];
+        particles = [];
+        floatingTexts = [];
+
+        player.x = 200;
+        player.y = 510;
+        player.vx = 0;
+        player.vy = 0;
+        player.invuln = 1.0;
+        camera.x = 0;
+
+        portal.unlocked = false;
+        portal.x = 6230;
+
+        const info = SECTOR_INFO[stageNum];
+        boss = {
+          stage: stageNum,
+          name: info.bossName,
+          x: 5860, y: 495, vx: 0, vy: 0,
+          w: stageNum === 4 ? 116 : 96,
+          h: stageNum === 4 ? 144 : 124,
+          hp: info.bossHp,
+          maxHp: info.bossHp,
+          defeated: false,
+          active: false,
+          attackCd: 1.6,
+          jumpCd: 3.0,
+          hitFlash: 0,
+          moveDir: -1
+        };
+
+        if (stageNum === 4) {
+          mom.x = 6220;
+          mom.y = 532;
+          mom.rescued = false;
+          mom.cageBroken = false;
+          mom.hugged = false;
+          mom.jumpPhase = 0;
+        }
+        updateHud();
+      }
+
+      function resetMatch() {
+        score = 0;
+        spawnTimer = 0.5;
+        screenShake = 0;
+        rescueSequence = false;
+        rescueTimer = 0;
+
+        player.maxHp = state.isVip ? 200 : 100;
+        player.hp = player.maxHp;
+        player.grounded = false;
+        player.weaponIdx = 0;
+        player.fireCd = 0;
+        player.recoil = 0;
+        player.dashTimer = 0;
+        player.dashCd = 0;
+
+        setupSector(1);
+      }
+
+      function startGame() {
+        getAC();
+        resetMatch();
+        running = true;
+        document.getElementById('gameOverlay').classList.add('hidden');
+        document.getElementById('startActionBtn').textContent = '작전 재시작';
+        if (state.bgmEnabled) startBGM();
+      }
+
+      function gameOver() {
+        running = false;
+        stopBGM();
+        const finalScore = Math.floor(score);
+        if (finalScore > state.highScore) state.highScore = finalScore;
+        if (sector > state.bestSector) state.bestSector = sector;
+        saveState(true);
+        updateHeaderUI();
+
+        document.getElementById('overlayIcon').textContent = '💀';
+        document.getElementById('overlayTitle').textContent = '작전 실패';
+        document.getElementById('overlayTitle').className = 'text-2xl sm:text-3xl font-black text-rose-400 tracking-tight';
+        document.getElementById('overlaySub').innerHTML = `최종 점수: <strong class="text-amber-300 text-base">${finalScore.toLocaleString()}점</strong>`;
+        document.getElementById('overlayStartBtn').textContent = '🔄 다시 도전하기';
+        document.getElementById('gameOverlay').classList.remove('hidden');
+      }
+
+      function gameClear() {
+        running = false;
+        stopBGM();
+        const bonus = state.isVip ? 5000 : 2500;
+        score += bonus;
+        const finalScore = Math.floor(score);
+        if (finalScore > state.highScore) state.highScore = finalScore;
+        state.bestSector = 4;
+        saveState(true);
+        updateHeaderUI();
+
+        document.getElementById('overlayIcon').textContent = '🎉';
+        document.getElementById('overlayTitle').textContent = 'GAME CLEAR! 엄마 구출 성공!';
+        document.getElementById('overlayTitle').className = 'text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight';
+        document.getElementById('overlaySub').innerHTML = `엄마를 무사히 구출했습니다! · 최종 점수: <strong class="text-amber-300 text-base">${finalScore.toLocaleString()}점</strong>`;
+        document.getElementById('overlayStartBtn').textContent = '▶ 처음부터 다시하기';
+        document.getElementById('gameOverlay').classList.remove('hidden');
+      }
+
+      function selectWeapon(idx) {
+        if (idx < 0 || idx > 3) return;
+        player.weaponIdx = idx;
+        updateHud();
+      }
+
+      function fireWeapon() {
+        if (player.fireCd > 0 || rescueSequence) return;
+        const w = WEAPON_DEFS[player.weaponIdx];
+
+        player.fireCd = w.cd;
+        player.recoil = 6;
+        playSfx(w.sfx);
+
+        const muzzleX = player.x + Math.cos(player.aimAngle) * 28;
+        const muzzleY = (player.y - 4) + Math.sin(player.aimAngle) * 28;
+
+        if (player.weaponIdx === 0) {
+          const jitter = (Math.random() - 0.5) * 0.04;
+          const ang = player.aimAngle + jitter;
+          bullets.push({
+            type: 'laser', x: muzzleX, y: muzzleY,
+            vx: Math.cos(ang) * 1140,
+            vy: Math.sin(ang) * 1140,
+            dmg: 28, life: 1.15, color: '#facc15', radius: 5
+          });
+        } else if (player.weaponIdx === 1) {
+          bullets.push({
+            type: 'grenade', x: muzzleX, y: muzzleY,
+            vx: Math.cos(player.aimAngle) * 860,
+            vy: Math.sin(player.aimAngle) * 860,
+            dmg: 125, life: 2.0, color: '#f97316', radius: 7
+          });
+        } else if (player.weaponIdx === 2) {
+          bullets.push({
+            type: 'plasma', x: muzzleX, y: muzzleY,
+            vx: Math.cos(player.aimAngle) * 1000,
+            vy: Math.sin(player.aimAngle) * 1000,
+            dmg: 75, life: 1.35, color: '#38bdf8', radius: 8, pierced: new Set()
+          });
+        } else if (player.weaponIdx === 3) {
+          const spread = (Math.random() - 0.5) * 0.25;
+          const ang = player.aimAngle + spread;
+          bullets.push({
+            type: 'flame', x: muzzleX, y: muzzleY,
+            vx: Math.cos(ang) * 540,
+            vy: Math.sin(ang) * 540,
+            dmg: 18, life: 0.42, color: '#fb923c', radius: 13
+          });
+        }
+
+        particles.push({
+          kind: 'flash',
+          x: muzzleX, y: muzzleY,
+          vx: 0, vy: 0,
+          life: 0.07, maxLife: 0.07,
+          color: '#fef08a', size: 14
+        });
+      }
+
+      function spawnEnemy() {
+        if (player.x > 5150) return;
+
+        const side = Math.random() < 0.78 ? 1 : -1;
+        const spawnOffset = CAM_W * 0.56 + Math.random() * 180;
+        const x = Math.max(60, Math.min(5150, player.x + side * spawnOffset));
+        const y = Math.random() < 0.35 ? 210 : 510;
+        const roll = Math.random();
+
+        if (roll < 0.55) {
+          enemies.push({
+            kind: 'alien_trooper', x, y, vx: 0, vy: 0, w: 32, h: 42,
+            hp: 40 + sector * 14, maxHp: 40 + sector * 14,
+            speed: 190 + sector * 12, dmg: 14, score: 100,
+            color: '#84cc16', jumpCd: 1.5, hitFlash: 0, walkCycle: Math.random() * 5
+          });
+        } else if (roll < 0.85) {
+          enemies.push({
+            kind: 'alien_scout', x, y, vx: 0, vy: 0, w: 30, h: 36,
+            hp: 34 + sector * 10, maxHp: 34 + sector * 10,
+            speed: 245 + sector * 14, dmg: 12, score: 130,
+            color: '#38bdf8', jumpCd: 0.9, hitFlash: 0, walkCycle: Math.random() * 5
+          });
+        } else {
+          enemies.push({
+            kind: 'alien_guard', x, y, vx: 0, vy: 0, w: 46, h: 58,
+            hp: 140 + sector * 35, maxHp: 140 + sector * 35,
+            speed: 120 + sector * 10, dmg: 22, score: 300,
+            color: '#a855f7', jumpCd: 2.4, hitFlash: 0, walkCycle: Math.random() * 5
+          });
+        }
+      }
+
+      function explodeAt(x, y, radius, dmg) {
+        spawnVisualExplosion(x, y);
+        for (let i = 0; i < enemies.length; i++) {
+          const en = enemies[i];
+          if (en.hp > 0 && Math.hypot(en.x - x, en.y - y) <= radius + en.w * 0.5) {
+            damageEnemy(en, dmg);
+          }
+        }
+        if (boss && !boss.defeated && boss.hp > 0 && Math.hypot(boss.x - x, boss.y - y) <= radius + boss.w * 0.55) {
+          damageBoss(dmg);
+        }
+      }
+
+      function damageEnemy(en, dmg) {
+        if (en.hp <= 0) return;
+        en.hp -= dmg;
+        en.hitFlash = 0.08;
+        if (en.hp <= 0) {
+          const mult = state.isVip ? 2 : 1;
+          const pts = en.score * mult;
+          score += pts;
+          floatingTexts.push({ x: en.x, y: en.y - 28, text: `+${pts}`, color: '#fde047', life: 0.8 });
+
+          for (let i = 0; i < 7; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const sp = 50 + Math.random() * 140;
+            particles.push({
+              kind: 'smoke',
+              x: en.x, y: en.y,
+              vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 30,
+              life: 0.38, maxLife: 0.38,
+              color: i % 2 === 0 ? '#fb923c' : '#cbd5e1',
+              size: 10 + Math.random() * 6
+            });
+          }
+
+          if (Math.random() < 0.25) {
+            pickups.push({ x: en.x, y: en.y, vy: -210, type: 'heal', life: 16 });
+          }
+          updateHud();
+        }
+      }
+
+      function damageBoss(dmg) {
+        if (!boss || boss.defeated || boss.hp <= 0) return;
+        boss.hp -= dmg;
+        boss.hitFlash = 0.08;
+        if (boss.hp <= 0) {
+          boss.hp = 0;
+          boss.defeated = true;
+          boss.active = false;
+
+          const mult = state.isVip ? 2 : 1;
+          score += (1000 * sector) * mult;
+          player.hp = Math.min(player.maxHp, player.hp + 40);
+          updateHud();
+
+          // 재귀 피해 호출 없이 순수 시각 폭발만 생성하여 멈춤 방지
+          spawnVisualExplosion(boss.x - 25, boss.y - 20);
+          spawnVisualExplosion(boss.x + 25, boss.y + 15);
+          enemies.length = 0;
+          enemyBullets.length = 0;
+          bullets.length = 0;
+
+          if (sector < 4) {
+            portal.unlocked = true;
+            playSfx('portal');
+            showToast(`🌀 보스 격파! 오른쪽 포탈이 열렸습니다!`);
+          } else {
+            rescueSequence = true;
+            rescueTimer = 0;
+            mom.cageBroken = true;
+            playSfx('clear');
+            showToast('💥 외계인 대장 보스 격파! 엄마가 구출됩니다!');
+          }
+        }
+      }
+
+      function resolvePlatformCollision(ent, prevY) {
+        const wasGrounded = ent.grounded;
+        ent.grounded = false;
+        const halfW = ent.w / 2;
+        const halfH = ent.h / 2;
+        for (const p of PLATFORMS) {
+          const withinX = (ent.x + halfW > p.x) && (ent.x - halfW < p.x + p.w);
+          if (withinX && ent.vy >= 0 && (prevY + halfH <= p.y + 10) && (ent.y + halfH >= p.y)) {
+            ent.y = p.y - halfH;
+            ent.vy = 0;
+            ent.grounded = true;
+            if (!wasGrounded && ent === player) {
+              spawnCartoonDust(player.x, p.y, 4);
+            }
+          }
+        }
+      }
+
+      function updateGame(dt) {
+        if (screenShake > 0) screenShake = Math.max(0, screenShake - dt * 30);
+        if (player.fireCd > 0) player.fireCd = Math.max(0, player.fireCd - dt);
+        if (player.recoil > 0) player.recoil = Math.max(0, player.recoil - dt * 36);
+        if (player.invuln > 0) player.invuln = Math.max(0, player.invuln - dt);
+        if (player.dashCd > 0) player.dashCd = Math.max(0, player.dashCd - dt);
+
+        // ==========================================
+        // 4섹터 최종 보스 격파 후 엄마 구출 모션 (5.6초 연출)
+        // ==========================================
+        if (rescueSequence) {
+          rescueTimer += dt;
+          const targetX = player.x + 48;
+
+          if (rescueTimer < 1.8) {
+            if (Math.abs(mom.x - targetX) > 4) {
+              mom.x += (targetX > mom.x ? 1 : -1) * 230 * dt;
+              mom.jumpPhase += dt * 20;
+            }
+          } else if (rescueTimer < 3.6) {
+            mom.hugged = true;
+            mom.jumpPhase += dt * 12;
+            player.walkCycle += dt * 12;
+            if (Math.random() < 0.25) {
+              particles.push({
+                kind: 'heart',
+                x: (player.x + mom.x) / 2 + (Math.random() - 0.5) * 40,
+                y: player.y - 45,
+                vx: (Math.random() - 0.5) * 40,
+                vy: -55 - Math.random() * 35,
+                life: 1.1, maxLife: 1.1,
+                color: '#f43f5e', size: 14
+              });
+            }
+          } else {
+            mom.rescued = true;
+            mom.jumpPhase += dt * 15;
+            player.walkCycle += dt * 15;
+            if (Math.random() < 0.22) {
+              const fx = camera.x + 200 + Math.random() * (CAM_W - 400);
+              const fy = 120 + Math.random() * 180;
+              const cols = ['#facc15', '#38bdf8', '#f472b6', '#4ade80'];
+              const c = cols[Math.floor(Math.random() * cols.length)];
+              for (let k = 0; k < 12; k++) {
+                const a = (Math.PI * 2 * k) / 12;
+                particles.push({
+                  kind: 'spark',
+                  x: fx, y: fy,
+                  vx: Math.cos(a) * 140, vy: Math.sin(a) * 140,
+                  life: 0.65, maxLife: 0.65,
+                  color: c, size: 6
+                });
+              }
+            }
+          }
+
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const pt = particles[i];
+            pt.x += pt.vx * dt;
+            pt.y += pt.vy * dt;
+            pt.life -= dt;
+            if (pt.life <= 0) particles.splice(i, 1);
+          }
+
+          if (rescueTimer >= 5.6) {
+            rescueSequence = false;
+            gameClear();
+          }
+          return;
+        }
+
+        // 1. 플레이어 이동 & 대시
+        let moveX = 0;
+        if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+
+        if (player.dashTimer > 0) {
+          player.dashTimer -= dt;
+          player.vx = player.dashDir * 860;
+          player.walkCycle += dt * 24;
+        } else {
+          player.vx = moveX * 440;
+          if (moveX !== 0) player.walkCycle += dt * 15;
+        }
+
+        if ((keys['KeyW'] || keys['ArrowUp'] || keys['Space']) && player.grounded) {
+          player.vy = -650;
+          player.grounded = false;
+          spawnCartoonDust(player.x, player.y + player.h / 2, 5);
+        }
+
+        const prevY = player.y;
+        player.vy += GRAVITY * dt;
+        player.x = Math.max(32, Math.min(MAP_W - 32, player.x + player.vx * dt));
+        player.y += player.vy * dt;
+        resolvePlatformCollision(player, prevY);
+
+        // 보스 처치 후 개방된 포탈 진입 시 다음 섹터로 이동
+        if (sector < 4 && portal.unlocked && Math.abs(player.x - portal.x) < 48 && Math.abs(player.y - portal.y) < 80) {
+          playSfx('portal');
+          score += 500;
+          const nextSec = sector + 1;
+          showToast(`🌀 포탈 통과! ${SECTOR_INFO[nextSec].title} 구역으로 진입합니다!`);
+          setupSector(nextSec);
+          return;
+        }
+
+        // 카메라 추적 (보스방 진입 시 카메라 고정)
+        if (player.x > 5280) {
+          const bossCamX = MAP_W - CAM_W;
+          camera.x += (bossCamX - camera.x) * Math.min(1, dt * 5.0);
+          if (boss && !boss.defeated && boss.hp > 0 && !boss.active) {
+            boss.active = true;
+            showToast(`⚠️ 보스 출현! ${boss.name}`);
+          }
+        } else {
+          const desiredOffset = moveX > 0 ? CAM_W * 0.36 : (moveX < 0 ? CAM_W * 0.64 : CAM_W * 0.42);
+          const targetCamX = Math.max(0, Math.min(MAP_W - CAM_W, player.x - desiredOffset));
+          camera.x += (targetCamX - camera.x) * Math.min(1, dt * 8.0);
+        }
+
+        // 조준 및 발사
+        const worldAimX = pointerScreen.x + camera.x;
+        const worldAimY = pointerScreen.y + camera.y;
+
+        if (aimStickVec.active) {
+          player.aimAngle = Math.atan2(aimStickVec.y, aimStickVec.x);
+          fireWeapon();
+        } else {
+          player.aimAngle = Math.atan2(worldAimY - (player.y - 4), worldAimX - player.x);
+          if (isFiring) fireWeapon();
+        }
+
+        // 2. 일반 외계인 스폰 & AI
+        spawnTimer -= dt;
+        if (spawnTimer <= 0 && enemies.length < 20) {
+          spawnEnemy();
+          spawnTimer = Math.max(0.55, 1.45 - sector * 0.12);
+        }
+
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          const en = enemies[i];
+          if (!en || en.hp <= 0) { enemies.splice(i, 1); continue; }
+          if (en.hitFlash > 0) en.hitFlash = Math.max(0, en.hitFlash - dt);
+
+          const dx = player.x - en.x;
+          const dy = player.y - en.y;
+          const dir = dx >= 0 ? 1 : -1;
+          en.vx = dir * en.speed;
+          en.walkCycle += dt * 12;
+
+          en.jumpCd -= dt;
+          if (en.grounded && en.jumpCd <= 0 && (dy < -45 || (en.kind === 'alien_scout' && Math.abs(dx) < 290))) {
+            en.vy = en.kind === 'alien_scout' ? -590 : -520;
+            en.grounded = false;
+            en.jumpCd = en.kind === 'alien_scout' ? 1.05 : 1.85;
+          }
+
+          const ePrevY = en.y;
+          en.vy += GRAVITY * dt;
+          en.x = Math.max(24, Math.min(MAP_W - 24, en.x + en.vx * dt));
+          en.y += en.vy * dt;
+          resolvePlatformCollision(en, ePrevY);
+
+          if (player.invuln <= 0 && Math.abs(en.x - player.x) < (en.w + player.w) * 0.44 && Math.abs(en.y - player.y) < (en.h + player.h) * 0.44) {
+            player.hp = Math.max(0, player.hp - en.dmg);
+            player.invuln = 0.85;
+            screenShake = 8;
+            floatingTexts.push({ x: player.x, y: player.y - 34, text: `-${en.dmg}`, color: '#f87171', life: 0.75 });
+            updateHud();
+            if (player.hp <= 0) { gameOver(); return; }
+          }
+        }
+
+        // 2-1. 섹터별 보스 AI
+        if (boss && !boss.defeated && boss.hp > 0 && boss.active) {
+          if (boss.hitFlash > 0) boss.hitFlash = Math.max(0, boss.hitFlash - dt);
+          const dx = player.x - boss.x;
+          boss.moveDir = dx >= 0 ? 1 : -1;
+          boss.vx = boss.moveDir * (120 + sector * 12);
+
+          boss.jumpCd -= dt;
+          if (boss.grounded && boss.jumpCd <= 0) {
+            boss.vy = -560;
+            boss.grounded = false;
+            boss.jumpCd = 2.9;
+          }
+
+          const bPrevY = boss.y;
+          boss.vy += GRAVITY * dt;
+          boss.x = Math.max(5240, Math.min(6060, boss.x + boss.vx * dt));
+          boss.y += boss.vy * dt;
+          resolvePlatformCollision(boss, bPrevY);
+
+          boss.attackCd -= dt;
+          if (boss.attackCd <= 0) {
+            boss.attackCd = Math.max(1.3, 2.1 - sector * 0.15);
+            const baseAng = Math.atan2(player.y - boss.y, player.x - boss.x);
+            const spreadList = sector >= 3 ? [-0.22, 0, 0.22] : [-0.12, 0.12];
+            spreadList.forEach(offset => {
+              const a = baseAng + offset;
+              enemyBullets.push({
+                x: boss.x + boss.moveDir * 36,
+                y: boss.y - 16,
+                vx: Math.cos(a) * (390 + sector * 25),
+                vy: Math.sin(a) * (390 + sector * 25),
+                radius: 10,
+                dmg: 14 + sector * 2,
+                life: 3.0,
+                style: sector === 1 ? 'chalk' : 'plasma'
+              });
+            });
+          }
+
+          if (player.invuln <= 0 && Math.abs(boss.x - player.x) < (boss.w + player.w) * 0.45 && Math.abs(boss.y - player.y) < (boss.h + player.h) * 0.45) {
+            player.hp = Math.max(0, player.hp - 22);
+            player.invuln = 0.9;
+            screenShake = 10;
+            updateHud();
+            if (player.hp <= 0) { gameOver(); return; }
+          }
+        }
+
+        // 3. 플레이어 탄환 업데이트
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const b = bullets[i];
+          if (!b) continue;
+          b.life -= dt;
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+
+          if (b.life <= 0 || b.x < 0 || b.x > MAP_W || b.y >= 576 || b.y < -40) {
+            if (b.type === 'grenade') explodeAt(b.x, Math.min(572, b.y), 108, b.dmg);
+            if (bullets[i] === b) bullets.splice(i, 1);
+            continue;
+          }
+
+          let hitTarget = false;
+          for (let j = 0; j < enemies.length; j++) {
+            const en = enemies[j];
+            if (!en || en.hp <= 0) continue;
+            if (b.pierced && b.pierced.has(en)) continue;
+            if (Math.abs(b.x - en.x) < en.w * 0.55 + b.radius && Math.abs(b.y - en.y) < en.h * 0.55 + b.radius) {
+              if (b.type === 'grenade') {
+                explodeAt(b.x, b.y, 108, b.dmg);
+                if (bullets[i] === b) bullets.splice(i, 1);
+                hitTarget = true;
+                break;
+              } else if (b.type === 'plasma') {
+                b.pierced.add(en);
+                damageEnemy(en, b.dmg);
+              } else {
+                damageEnemy(en, b.dmg);
+                if (bullets[i] === b) bullets.splice(i, 1);
+                hitTarget = true;
+                break;
+              }
+            }
+          }
+          if (hitTarget || rescueSequence) continue;
+
+          if (boss && !boss.defeated && boss.hp > 0) {
+            if (b.pierced && b.pierced.has(boss)) continue;
+            if (Math.abs(b.x - boss.x) < boss.w * 0.52 + b.radius && Math.abs(b.y - boss.y) < boss.h * 0.52 + b.radius) {
+              if (b.type === 'grenade') {
+                explodeAt(b.x, b.y, 108, b.dmg);
+                if (bullets[i] === b) bullets.splice(i, 1);
+              } else if (b.type === 'plasma') {
+                b.pierced.add(boss);
+                damageBoss(b.dmg);
+              } else {
+                damageBoss(b.dmg);
+                if (bullets[i] === b) bullets.splice(i, 1);
+              }
+            }
+          }
+        }
+
+        // 3-1. 보스 공격 탄환 업데이트
+        for (let i = enemyBullets.length - 1; i >= 0; i--) {
+          const eb = enemyBullets[i];
+          if (!eb) continue;
+          eb.life -= dt;
+          eb.x += eb.vx * dt;
+          eb.y += eb.vy * dt;
+          if (eb.life <= 0 || eb.y >= 576 || eb.x < 0 || eb.x > MAP_W) {
+            enemyBullets.splice(i, 1);
+            continue;
+          }
+          if (player.invuln <= 0 && Math.hypot(eb.x - player.x, eb.y - player.y) < eb.radius + 16) {
+            player.hp = Math.max(0, player.hp - eb.dmg);
+            player.invuln = 0.8;
+            screenShake = 8;
+            floatingTexts.push({ x: player.x, y: player.y - 34, text: `-${eb.dmg}`, color: '#f87171', life: 0.75 });
+            enemyBullets.splice(i, 1);
+            updateHud();
+            if (player.hp <= 0) { gameOver(); return; }
+          }
+        }
+
+        // 4. 구급 상자 아이템
+        for (let i = pickups.length - 1; i >= 0; i--) {
+          const pk = pickups[i];
+          pk.life -= dt;
+          if (pk.life <= 0) { pickups.splice(i, 1); continue; }
+          const pPrev = pk.y;
+          pk.vy += GRAVITY * 0.7 * dt;
+          pk.y += pk.vy * dt;
+          const dummy = { x: pk.x, y: pk.y, w: 24, h: 24, vy: pk.vy, grounded: false };
+          resolvePlatformCollision(dummy, pPrev);
+          pk.y = dummy.y; pk.vy = dummy.vy;
+
+          if (Math.hypot(pk.x - player.x, pk.y - player.y) < 40) {
+            playSfx('pickup');
+            player.hp = Math.min(player.maxHp, player.hp + 35);
+            showToast('💚 구급 상자 획득 (+35 체력)');
+            pickups.splice(i, 1);
+            updateHud();
+          }
+        }
+
+        // 5. 파티클 & 플로팅 텍스트
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const pt = particles[i];
+          pt.x += pt.vx * dt;
+          pt.y += pt.vy * dt;
+          pt.life -= dt;
+          if (pt.life <= 0) particles.splice(i, 1);
+        }
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+          const ft = floatingTexts[i];
+          ft.y -= 36 * dt;
+          ft.life -= dt;
+          if (ft.life <= 0) floatingTexts.splice(i, 1);
+        }
+      }
+
+      // ==========================================
+      // 4. 4개 섹터 전용 카툰 배경 & 보스 렌더링 (배경 텍스트 제거)
+      // ==========================================
+      function drawOutlinedRect(x, y, w, h, r, fill, stroke = '#090d16', lw = 3) {
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lw;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, r);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      function renderSectorBackground() {
+        if (sector === 1) {
+          // STAGE 1: 학교 교실 & 복도 (글자 없이 칠판·창문·사물함 그래픽만)
+          ctx.fillStyle = '#fef3c7';
+          ctx.fillRect(0, 0, CAM_W, CAM_H);
+
+          ctx.fillStyle = '#d97706';
+          ctx.fillRect(0, 380, CAM_W, 196);
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(0, 380); ctx.lineTo(CAM_W, 380); ctx.stroke();
+
+          const step = 520;
+          const first = Math.floor((camera.x * 0.45) / step) * step;
+          for (let mx = first; mx < camera.x * 0.45 + CAM_W + step; mx += step) {
+            const sx = mx - camera.x * 0.45;
+            // 초록 칠판 + 분필 받침대
+            drawOutlinedRect(sx + 40, 95, 220, 135, 6, '#14532d', '#78350f', 5);
+            drawOutlinedRect(sx + 55, 224, 190, 8, 2, '#92400e', '#090d16', 2);
+
+            // 교실 창문
+            drawOutlinedRect(sx + 290, 95, 180, 165, 6, '#7dd3fc', '#090d16', 3);
+            ctx.strokeStyle = '#090d16';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(sx + 380, 95); ctx.lineTo(sx + 380, 260);
+            ctx.moveTo(sx + 290, 177); ctx.lineTo(sx + 470, 177);
+            ctx.stroke();
+
+            // 사물함
+            for (let k = 0; k < 3; k++) {
+              drawOutlinedRect(sx + 50 + k * 56, 396, 52, 180, 4, '#60a5fa', '#090d16', 2.5);
+            }
+          }
+        } else if (sector === 2) {
+          // STAGE 2: 지하철역 승강장 (글자 없이 타일·노선띠·전동차 그래픽만)
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillRect(0, 0, CAM_W, CAM_H);
+
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(0, 210, CAM_W, 28);
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(0, 210, CAM_W, 28);
+
+          const step = 480;
+          const first = Math.floor((camera.x * 0.45) / step) * step;
+          for (let mx = first; mx < camera.x * 0.45 + CAM_W + step; mx += step) {
+            const sx = mx - camera.x * 0.45;
+            drawOutlinedRect(sx + 24, 0, 44, 576, 0, '#475569', '#090d16', 3);
+
+            // 노선 안내 전광판 프레임 (텍스트 없음)
+            drawOutlinedRect(sx + 130, 88, 240, 44, 10, '#0f172a', '#0284c7', 4);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(sx + 150, 107, 200, 6);
+
+            // 스크린도어 & 전동차
+            drawOutlinedRect(sx + 110, 320, 280, 256, 6, '#334155', '#090d16', 3);
+            drawOutlinedRect(sx + 130, 345, 105, 130, 6, '#38bdf8', '#090d16', 2.5);
+            drawOutlinedRect(sx + 265, 345, 105, 130, 6, '#38bdf8', '#090d16', 2.5);
+          }
+        } else if (sector === 3) {
+          // STAGE 3: 외계인이 침공한 도심 외곽
+          const skyGrad = ctx.createLinearGradient(0, 0, 0, CAM_H);
+          skyGrad.addColorStop(0, '#0f172a');
+          skyGrad.addColorStop(0.5, '#1e293b');
+          skyGrad.addColorStop(0.85, '#7c2d12');
+          skyGrad.addColorStop(1, '#c2410c');
+          ctx.fillStyle = skyGrad;
+          ctx.fillRect(0, 0, CAM_W, CAM_H);
+
+          const ufoX = 860 - camera.x * 0.05;
+          ctx.fillStyle = '#1e293b';
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(ufoX, 115, 110, 26, 0, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+
+          const farStep = 340;
+          const firstFar = Math.floor((camera.x * 0.2) / farStep) * farStep;
+          for (let fx = firstFar; fx < camera.x * 0.2 + CAM_W + farStep; fx += farStep) {
+            const sx = fx - camera.x * 0.2;
+            const bh = 185 + ((Math.abs(fx) / 340) % 3) * 55;
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#020617';
+            ctx.lineWidth = 3;
+            ctx.fillRect(sx + 10, CAM_H - 64 - bh, 140, bh);
+            ctx.strokeRect(sx + 10, CAM_H - 64 - bh, 140, bh);
+            ctx.fillRect(sx + 175, CAM_H - 64 - (bh - 40), 120, bh - 40);
+            ctx.strokeRect(sx + 175, CAM_H - 64 - (bh - 40), 120, bh - 40);
+
+            ctx.fillStyle = 'rgba(251, 191, 36, 0.35)';
+            ctx.fillRect(sx + 32, CAM_H - 64 - bh + 28, 18, 12);
+            ctx.fillRect(sx + 68, CAM_H - 64 - bh + 28, 18, 12);
+          }
+        } else {
+          // STAGE 4: 엄마 회사 건물 내부
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(0, 0, CAM_W, CAM_H);
+
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, 0, CAM_W, 44);
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(0, 0, CAM_W, 44);
+
+          const midStep = 440;
+          const firstMid = Math.floor((camera.x * 0.45) / midStep) * midStep;
+          for (let mx = firstMid; mx < camera.x * 0.45 + CAM_W + midStep; mx += midStep) {
+            const sx = mx - camera.x * 0.45;
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(sx + 20, 44, 34, CAM_H - 108);
+            ctx.strokeRect(sx + 20, 44, 34, CAM_H - 108);
+
+            drawOutlinedRect(sx + 85, 95, 290, 210, 8, '#0c4a6e', '#090d16', 3);
+            ctx.fillStyle = 'rgba(186, 230, 253, 0.16)';
+            ctx.beginPath();
+            ctx.moveTo(sx + 105, 105);
+            ctx.lineTo(sx + 155, 105);
+            ctx.lineTo(sx + 115, 295);
+            ctx.lineTo(sx + 95, 295);
+            ctx.closePath();
+            ctx.fill();
+
+            drawOutlinedRect(sx + 140, 48, 180, 12, 4, '#e0f2fe', '#090d16', 2);
+            drawOutlinedRect(sx + 165, 376, 130, 200, 4, '#475569', '#090d16', 3);
+            ctx.beginPath();
+            ctx.moveTo(sx + 230, 376);
+            ctx.lineTo(sx + 230, 576);
+            ctx.stroke();
+          }
+        }
+      }
+
+      function renderBossCharacter(b) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.scale(b.moveDir, 1);
+        const flash = b.hitFlash > 0;
+
+        if (b.stage === 1) {
+          // 1섹터 보스: 대머리 교장선생님
+          drawOutlinedRect(-28, 22, 20, 40, 5, '#1e293b', '#090d16', 3);
+          drawOutlinedRect(8, 22, 20, 40, 5, '#1e293b', '#090d16', 3);
+          drawOutlinedRect(-38, -24, 76, 52, 12, flash ? '#ffffff' : '#334155', '#090d16', 4);
+          drawOutlinedRect(-6, -18, 12, 34, 3, '#ef4444', '#090d16', 2);
+
+          ctx.fillStyle = flash ? '#ffffff' : '#fed7aa';
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(0, -42, 30, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+
+          if (!flash) {
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(-8, -56, 11, 5, -0.35, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.fillStyle = '#e2e8f0';
+          ctx.beginPath();
+          ctx.arc(-26, -40, 9, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+
+          drawOutlinedRect(4, -48, 24, 14, 3, '#ef4444', '#090d16', 3);
+          drawOutlinedRect(24, -10, 48, 8, 3, '#facc15', '#090d16', 2.5);
+        } else if (b.stage === 2) {
+          // 2섹터 보스: 외계인 역장 메카
+          drawOutlinedRect(-32, 20, 22, 42, 5, '#0f172a', '#090d16', 3);
+          drawOutlinedRect(10, 20, 22, 42, 5, '#0f172a', '#090d16', 3);
+          drawOutlinedRect(-44, -48, 88, 74, 16, flash ? '#ffffff' : '#0284c7', '#090d16', 4);
+          drawOutlinedRect(-38, -64, 76, 18, 6, '#facc15', '#090d16', 3);
+          drawOutlinedRect(8, -32, 32, 16, 5, '#f43f5e', '#090d16', 3);
+        } else if (b.stage === 3) {
+          // 3섹터 보스: 외계 돌격 사령관
+          drawOutlinedRect(-34, 22, 22, 42, 5, '#1e293b', '#090d16', 3);
+          drawOutlinedRect(12, 22, 22, 42, 5, '#1e293b', '#090d16', 3);
+          drawOutlinedRect(-46, -54, 92, 82, 20, flash ? '#ffffff' : '#16a34a', '#090d16', 4);
+          drawOutlinedRect(10, -34, 34, 16, 6, '#facc15', '#090d16', 3);
+        } else {
+          // 4섹터 최종 보스: 외계인 대장 보스
+          drawOutlinedRect(-36, 24, 24, 46, 6, '#334155', '#090d16', 4);
+          drawOutlinedRect(12, 24, 24, 46, 6, '#334155', '#090d16', 4);
+          drawOutlinedRect(-b.w / 2, -b.h / 2, b.w, b.h * 0.76, 22, flash ? '#ffffff' : '#7e22ce', '#090d16', 4);
+
+          ctx.fillStyle = flash ? '#ffffff' : '#f43f5e';
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(0, -b.h / 2 + 6, 34, Math.PI, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+
+          drawOutlinedRect(10, -28, 36, 18, 6, '#facc15', '#090d16', 3);
+        }
+        ctx.restore();
+
+        const bbw = 160;
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(b.x - bbw / 2 - 2, b.y - b.h / 2 - 48, bbw + 4, 12);
+        ctx.fillStyle = '#f43f5e';
+        ctx.fillRect(b.x - bbw / 2, b.y - b.h / 2 - 46, bbw * Math.max(0, b.hp / b.maxHp), 8);
+        ctx.fillStyle = '#fef08a';
+        ctx.font = '900 13px "Noto Sans KR"';
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 3;
+        ctx.strokeText(b.name, b.x, b.y - b.h / 2 - 55);
+        ctx.fillText(b.name, b.x, b.y - b.h / 2 - 55);
+      }
+
+      function renderWorld() {
+        ctx.save();
+        if (screenShake > 0) {
+          ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+        }
+
+        renderSectorBackground();
+
+        ctx.save();
+        ctx.translate(-camera.x, -camera.y);
+
+        // 1~3섹터 우측 끝 포탈
+        if (sector < 4) {
+          const pulse = Math.sin(performance.now() * 0.006) * 6;
+          ctx.save();
+          ctx.translate(portal.x, portal.y);
+
+          if (portal.unlocked) {
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.28)';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 48 + pulse, 74 + pulse, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#0284c7';
+            ctx.strokeStyle = '#e0f2fe';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 34, 60, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 13px "Noto Sans KR"';
+            ctx.textAlign = 'center';
+            ctx.fillText(SECTOR_INFO[sector].nextLabel, 0, -4);
+            ctx.font = '800 11px "Noto Sans KR"';
+            ctx.fillStyle = '#fef08a';
+            ctx.fillText('▶ 진입 가능', 0, 14);
+          } else {
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 34, 60, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '900 12px "Noto Sans KR"';
+            ctx.textAlign = 'center';
+            ctx.fillText('🔒 봉인됨', 0, -4);
+            ctx.font = '800 10px "Noto Sans KR"';
+            ctx.fillText('보스 처치 필요', 0, 14);
+          }
+          ctx.restore();
+        }
+
+        // 4섹터 보스방 우측 끝: 유리 캡슐에 갇힌 엄마 & 구출 모션
+        if (sector === 4) {
+          drawOutlinedRect(mom.x - 42, 552, 84, 24, 4, '#475569', '#090d16', 3);
+
+          const momJumpY = mom.rescued ? -Math.abs(Math.sin(mom.jumpPhase)) * 28 : (mom.hugged ? -Math.abs(Math.sin(mom.jumpPhase)) * 10 : (mom.cageBroken ? -Math.abs(Math.sin(mom.jumpPhase)) * 8 : 0));
+          ctx.save();
+          ctx.translate(mom.x, mom.y + momJumpY);
+
+          drawOutlinedRect(-8, 8, 6, 14, 2, '#1e293b', '#090d16', 2);
+          drawOutlinedRect(2, 8, 6, 14, 2, '#1e293b', '#090d16', 2);
+          drawOutlinedRect(-12, -10, 24, 20, 6, '#f472b6', '#090d16', 2.5);
+
+          if (mom.rescued || mom.hugged) {
+            drawOutlinedRect(-17, -22, 6, 14, 3, '#fed7aa', '#090d16', 2);
+            drawOutlinedRect(11, -22, 6, 14, 3, '#fed7aa', '#090d16', 2);
+          }
+
+          ctx.fillStyle = '#fed7aa';
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(0, -18, 11, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+
+          ctx.fillStyle = '#451a03';
+          ctx.beginPath();
+          ctx.arc(0, -20, 11.5, Math.PI * 0.85, Math.PI * 2.15);
+          ctx.fill(); ctx.stroke();
+
+          const speech = mom.rescued ? '집에 가자 우리 아들! ❤️' : (mom.hugged ? '무사했구나!! 😭❤️' : (mom.cageBroken ? '우리 아들!!' : '살려줘!!'));
+          drawOutlinedRect(-66, -60, 132, 24, 8, '#ffffff', '#090d16', 2.5);
+          ctx.fillStyle = '#090d16';
+          ctx.font = '900 11px "Noto Sans KR"';
+          ctx.textAlign = 'center';
+          ctx.fillText(speech, 0, -44);
+          ctx.restore();
+
+          if (!mom.cageBroken) {
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(mom.x - 32, 462, 64, 92, 16);
+            ctx.fill(); ctx.stroke();
+          }
+        }
+
+        // 카툰 지형 & 플랫폼 렌더링
+        PLATFORMS.forEach(p => {
+          if (p.x + p.w < camera.x - 50 || p.x > camera.x + CAM_W + 50) return;
+          if (p.style === 'ground') {
+            const gCol = sector === 1 ? '#b45309' : (sector === 2 ? '#334155' : (sector === 3 ? '#334155' : '#1e293b'));
+            const topCol = sector === 1 ? '#f59e0b' : (sector === 2 ? '#94a3b8' : (sector === 3 ? '#64748b' : '#475569'));
+            ctx.fillStyle = gCol;
+            ctx.fillRect(p.x, p.y, p.w, p.h);
+            ctx.fillStyle = topCol;
+            ctx.fillRect(p.x, p.y, p.w, 12);
+
+            ctx.strokeStyle = '#090d16';
+            ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.w, p.y); ctx.stroke();
+          } else {
+            const fillCol = sector === 1 ? '#d97706' : (sector === 2 ? '#0284c7' : (sector === 3 ? '#ea580c' : '#0ea5e9'));
+            drawOutlinedRect(p.x, p.y, p.w, p.h, 4, fillCol, '#090d16', 3);
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(p.x + 4, p.y + 3, p.w - 8, 5);
+          }
+        });
+
+        // 구급 상자 아이템
+        pickups.forEach(pk => {
+          drawOutlinedRect(pk.x - 15, pk.y - 15, 30, 30, 6, '#22c55e', '#090d16', 3);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '900 18px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('+', pk.x, pk.y + 1);
+        });
+
+        // 일반 외계인 적군
+        enemies.forEach(en => {
+          if (en.x + 70 < camera.x || en.x - 70 > camera.x + CAM_W) return;
+          ctx.save();
+          ctx.translate(en.x, en.y);
+          const dir = player.x >= en.x ? 1 : -1;
+          ctx.scale(dir, 1);
+
+          const bodyColor = en.hitFlash > 0 ? '#ffffff' : en.color;
+          const legSwing = Math.sin(en.walkCycle) * 5;
+
+          drawOutlinedRect(-10 + legSwing * 0.5, 4, 8, en.h * 0.42, 3, '#1e293b', '#090d16', 2.5);
+          drawOutlinedRect(2 - legSwing * 0.5, 4, 8, en.h * 0.42, 3, '#1e293b', '#090d16', 2.5);
+          drawOutlinedRect(-en.w / 2, -en.h / 2, en.w, en.h * 0.74, 12, bodyColor, '#090d16', 3);
+
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(-4, -en.h / 2); ctx.lineTo(-10, -en.h / 2 - 11);
+          ctx.moveTo(4, -en.h / 2); ctx.lineTo(10, -en.h / 2 - 11);
+          ctx.stroke();
+
+          drawOutlinedRect(2, -en.h * 0.34, en.w * 0.42, 11, 5, '#ef4444', '#090d16', 2.5);
+          ctx.restore();
+
+          const bw = en.w + 10;
+          ctx.fillStyle = '#090d16';
+          ctx.fillRect(en.x - bw / 2 - 1, en.y - en.h / 2 - 16, bw + 2, 7);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(en.x - bw / 2, en.y - en.h / 2 - 15, bw * Math.max(0, en.hp / en.maxHp), 5);
+        });
+
+        // 섹터별 보스 렌더링
+        if (boss && !boss.defeated && boss.hp > 0) {
+          renderBossCharacter(boss);
+        }
+
+        // 주인공 렌더링
+        ctx.save();
+        if (player.invuln > 0 && Math.floor(player.invuln * 18) % 2 === 0) ctx.globalAlpha = 0.55;
+        const playerCelebrateY = (rescueSequence && (mom.rescued || mom.hugged)) ? -Math.abs(Math.sin(player.walkCycle)) * 24 : 0;
+        ctx.translate(player.x, player.y + playerCelebrateY);
+
+        if (player.dashTimer > 0) {
+          ctx.fillStyle = 'rgba(250, 204, 21, 0.35)';
+          ctx.beginPath();
+          ctx.arc(-player.dashDir * 14, 0, 26, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const faceDir = rescueSequence ? 1 : (Math.cos(player.aimAngle) >= 0 ? 1 : -1);
+        const legSwing = Math.sin(player.walkCycle) * 7;
+        const bobY = Math.abs(Math.sin(player.walkCycle)) * 2.5;
+
+        ctx.fillStyle = '#ef4444';
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-faceDir * 8, -16 - bobY);
+        ctx.lineTo(-faceDir * 24, -19 - bobY + Math.sin(player.walkCycle * 1.5) * 4);
+        ctx.lineTo(-faceDir * 20, -11 - bobY + Math.cos(player.walkCycle * 1.5) * 3);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+
+        drawOutlinedRect(-10 + legSwing * 0.5, 6, 8, 17, 3, '#3b82f6', '#090d16', 2.5);
+        drawOutlinedRect(2 - legSwing * 0.5, 6, 8, 17, 3, '#2563eb', '#090d16', 2.5);
+
+        drawOutlinedRect(-12, -11 - bobY, 24, 20, 6, '#f8fafc', '#090d16', 3);
+        drawOutlinedRect(-9, -11 - bobY, 18, 18, 4, '#d97706', '#090d16', 2.5);
+
+        ctx.fillStyle = '#fed7aa';
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, -19 - bobY, 12, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath();
+        ctx.arc(0, -21 - bobY, 12.5, Math.PI, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+
+        drawOutlinedRect(faceDir > 0 ? 1 : -11, -23 - bobY, 10, 6, 2, '#38bdf8', '#090d16', 2);
+
+        if (!rescueSequence) {
+          ctx.save();
+          ctx.translate(-Math.cos(player.aimAngle) * player.recoil, -3 - bobY - Math.sin(player.aimAngle) * player.recoil);
+          ctx.rotate(player.aimAngle);
+          const wDef = WEAPON_DEFS[player.weaponIdx];
+          drawOutlinedRect(2, -6, 28, 12, 3, '#475569', '#090d16', 3);
+          drawOutlinedRect(18, -5, 13, 10, 2, wDef.color, '#090d16', 2.5);
+          ctx.restore();
+        } else {
+          drawOutlinedRect(-17, -23 - bobY, 6, 14, 3, '#fed7aa', '#090d16', 2);
+          drawOutlinedRect(11, -23 - bobY, 6, 14, 3, '#fed7aa', '#090d16', 2);
+        }
+        ctx.restore();
+
+        // 탄환 & 파티클
+        bullets.forEach(b => {
+          ctx.save();
+          ctx.fillStyle = b.color;
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.radius * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        enemyBullets.forEach(eb => {
+          ctx.save();
+          ctx.fillStyle = eb.style === 'chalk' ? '#ffffff' : '#e879f9';
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(eb.x, eb.y, eb.radius, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+          ctx.restore();
+        });
+
+        particles.forEach(pt => {
+          ctx.save();
+          const ratio = Math.max(0, pt.life / (pt.maxLife || 0.4));
+          ctx.globalAlpha = ratio;
+          if (pt.kind === 'heart') {
+            ctx.font = '20px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('❤️', pt.x, pt.y);
+          } else if (pt.kind === 'smoke' || pt.kind === 'flash') {
+            ctx.fillStyle = pt.color;
+            ctx.strokeStyle = '#090d16';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, pt.size * (pt.kind === 'smoke' ? (1.3 - ratio * 0.4) : 1), 0, Math.PI * 2);
+            ctx.fill();
+            if (pt.kind === 'smoke') ctx.stroke();
+          } else {
+            ctx.fillStyle = pt.color;
+            ctx.fillRect(pt.x - pt.size / 2, pt.y - pt.size / 2, pt.size, pt.size);
+          }
+          ctx.restore();
+        });
+
+        // 조준 크로스헤어 & 텍스트
+        if (!aimStickVec.active && !rescueSequence) {
+          const aimX = pointerScreen.x + camera.x;
+          const aimY = pointerScreen.y + camera.y;
+          ctx.save();
+          ctx.strokeStyle = '#facc15';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(aimX, aimY, 12, 0, Math.PI * 2);
+          ctx.moveTo(aimX - 18, aimY); ctx.lineTo(aimX + 18, aimY);
+          ctx.moveTo(aimX, aimY - 18); ctx.lineTo(aimX, aimY + 18);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        floatingTexts.forEach(ft => {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, ft.life * 1.5);
+          ctx.font = '900 16px "Noto Sans KR"';
+          ctx.textAlign = 'center';
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 4;
+          ctx.strokeText(ft.text, ft.x, ft.y);
+          ctx.fillStyle = ft.color;
+          ctx.fillText(ft.text, ft.x, ft.y);
+          ctx.restore();
+        });
+
+        ctx.restore();
+
+        // 상단 진행 레이더 바
+        const radarW = 280;
+        const radarH = 18;
+        const rx = (CAM_W - radarW) / 2;
+        const ry = 14;
+        ctx.save();
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.roundRect(rx, ry, radarW, radarH, 6); ctx.fill(); ctx.stroke();
+
+        const camRatioX = (camera.x / MAP_W) * radarW;
+        const camRatioW = (CAM_W / MAP_W) * radarW;
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.22)';
+        ctx.fillRect(rx + camRatioX, ry + 1, camRatioW, radarH - 2);
+
+        const goalX = rx + ((sector < 4 ? portal.x : mom.x) / MAP_W) * radarW;
+        ctx.fillStyle = sector < 4 ? (portal.unlocked ? '#38bdf8' : '#f43f5e') : '#f472b6';
+        ctx.beginPath(); ctx.arc(goalX, ry + radarH / 2, 4, 0, Math.PI * 2); ctx.fill();
+
+        const px = rx + (player.x / MAP_W) * radarW;
+        ctx.fillStyle = '#4ade80';
+        ctx.beginPath(); ctx.arc(px, ry + radarH / 2, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+
+        ctx.restore();
+      }
+
+      let lastTs = 0;
+      function mainLoop(ts) {
+        const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0.016;
+        lastTs = ts;
+
+        if (running) updateGame(dt);
+
+        ctx.clearRect(0, 0, viewW, viewH);
+        const scale = Math.min(viewW / CAM_W, viewH / CAM_H);
+        const ox = (viewW - CAM_W * scale) / 2;
+        const oy = (viewH - CAM_H * scale) / 2;
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.scale(scale, scale);
+        renderWorld();
+        ctx.restore();
+
+        requestAnimationFrame(mainLoop);
+      }
+
+      // ==========================================
+      // 5. HUD & 입력 이벤트 바인딩
+      // ==========================================
+      function updateHud() {
+        document.getElementById('scoreDisplay').textContent = Math.floor(score).toLocaleString();
+        document.getElementById('waveDisplay').textContent = SECTOR_INFO[sector].title;
+        document.getElementById('hpText').textContent = `${Math.ceil(player.hp)}/${player.maxHp}`;
+        document.getElementById('hpBar').style.width = `${Math.max(0, (player.hp / player.maxHp) * 100)}%`;
+
+        const w = WEAPON_DEFS[player.weaponIdx];
+        document.getElementById('weaponDisplay').textContent = `${w.icon} ${w.name}`;
+        document.getElementById('ammoDisplay').textContent = '∞ 무제한';
+
+        document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
+          const idx = Number(btn.dataset.weapon);
+          if (idx === player.weaponIdx) {
+            btn.className = 'weapon-slot-btn rounded-xl p-2 border-2 border-amber-400 bg-slate-900 text-left transition cursor-pointer shadow';
+          } else {
+            btn.className = 'weapon-slot-btn rounded-xl p-2 border border-slate-800 bg-slate-900/70 text-left transition cursor-pointer opacity-80';
+          }
+        });
+      }
+
+      function screenToCamera(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const scale = Math.min(viewW / CAM_W, viewH / CAM_H);
+        const ox = (viewW - CAM_W * scale) / 2;
+        const oy = (viewH - CAM_H * scale) / 2;
+        return {
+          x: (clientX - rect.left - ox) / scale,
+          y: (clientY - rect.top - oy) / scale
+        };
+      }
+
+      canvas.addEventListener('pointermove', (e) => {
+        pointerScreen = screenToCamera(e.clientX, e.clientY);
+      });
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!running) return;
+        getAC();
+        pointerScreen = screenToCamera(e.clientX, e.clientY);
+        isFiring = true;
+      });
+      window.addEventListener('pointerup', () => { isFiring = false; });
+
+      window.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+        if (!running) return;
+        if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+        if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') triggerDash();
+        if (e.code === 'Digit1') selectWeapon(0);
+        else if (e.code === 'Digit2') selectWeapon(1);
+        else if (e.code === 'Digit3') selectWeapon(2);
+        else if (e.code === 'Digit4') selectWeapon(3);
+        else if (e.code === 'KeyQ') selectWeapon((player.weaponIdx + 1) % 4);
+      });
+      window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+      document.querySelectorAll('.weapon-slot-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectWeapon(Number(btn.dataset.weapon)));
+      });
+
+      function bindHoldKey(btnId, keyCode) {
+        const el = document.getElementById(btnId);
+        el.addEventListener('pointerdown', (e) => { e.preventDefault(); getAC(); keys[keyCode] = true; });
+        const rel = () => { keys[keyCode] = false; };
+        el.addEventListener('pointerup', rel);
+        el.addEventListener('pointercancel', rel);
+        el.addEventListener('pointerleave', rel);
+      }
+      bindHoldKey('mobLeftBtn', 'KeyA');
+      bindHoldKey('mobRightBtn', 'KeyD');
+      bindHoldKey('mobJumpBtn', 'KeyW');
+
+      document.getElementById('mobDashBtn').addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        getAC();
+        triggerDash();
+      });
+
+      document.getElementById('mobSwapBtn').addEventListener('click', () => {
+        selectWeapon((player.weaponIdx + 1) % 4);
+      });
+
+      const aimZone = document.getElementById('aimStickZone');
+      const aimKnob = document.getElementById('aimStickKnob');
+      let aimPointerId = null;
+
+      function updateAimStick(cx, cy) {
+        const rect = aimZone.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = cx - centerX;
+        const dy = cy - centerY;
+        const maxR = rect.width / 2 - 12;
+        const dist = Math.hypot(dx, dy);
+        const clamped = Math.min(dist, maxR);
+        const ang = Math.atan2(dy, dx);
+        aimKnob.style.transform = `translate(${Math.cos(ang) * clamped}px, ${Math.sin(ang) * clamped}px)`;
+        aimStickVec = { x: Math.cos(ang), y: Math.sin(ang), active: true };
+      }
+
+      aimZone.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        getAC();
+        aimPointerId = e.pointerId;
+        if (aimZone.setPointerCapture) try { aimZone.setPointerCapture(e.pointerId); } catch {}
+        updateAimStick(e.clientX, e.clientY);
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (aimPointerId !== null && e.pointerId === aimPointerId) updateAimStick(e.clientX, e.clientY);
+      });
+      const resetAimStick = (e) => {
+        if (aimPointerId !== null && e.pointerId === aimPointerId) {
+          aimPointerId = null;
+          aimKnob.style.transform = 'translate(0px, 0px)';
+          aimStickVec.active = false;
+        }
+      };
+      window.addEventListener('pointerup', resetAimStick);
+      window.addEventListener('pointercancel', resetAimStick);
+
+      // ==========================================
+      // 6. 랭킹 / 로그인 / VIP / 바로가기 / 토스트
+      // ==========================================
+      let toastTimer = null;
+      function showToast(msg) {
+        const b = document.getElementById('toastBox');
+        document.getElementById('toastMsg').textContent = msg;
+        b.classList.remove('opacity-0', 'translate-y-2');
+        b.classList.add('opacity-100', 'translate-y-0');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          b.classList.remove('opacity-100', 'translate-y-0');
+          b.classList.add('opacity-0', 'translate-y-2');
+        }, 2200);
+      }
+
+      async function fetchRanking() {
+        const listEl = document.getElementById('rankingListContainer');
+        const myRankEl = document.getElementById('myRankDetailText');
+        try {
+          const headers = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+          const res = await fetch(`${API_BASE_URL}/api/ranking?gameId=${GAME_ID}&_t=${Date.now()}`, { headers });
+          const data = await res.json();
+          if (!res.ok) throw new Error();
+
+          const rankings = data.rankings || [];
+          if (data.myRank) {
+            myRankEl.textContent = `전체 ${data.totalPlayers || rankings.length}명 중 ${data.myRank.rank}위 · 최고 ${Number(data.myRank.score || state.highScore).toLocaleString()}점`;
+          } else if (authToken) {
+            myRankEl.textContent = '작전 완료 시 최신 점수가 순위에 반영됩니다';
+          } else {
+            myRankEl.textContent = '로그인 시 실시간 순위에 등록됩니다';
+          }
+
+          if (rankings.length === 0) {
+            listEl.innerHTML = '<div class="text-center py-4 text-xs text-slate-500">아직 등록된 기록이 없습니다. 첫 1위에 도전하세요!</div>';
+            return;
+          }
+
+          listEl.innerHTML = rankings.slice(0, 15).map((item, idx) => {
+            const rank = item.rank ?? (idx + 1);
+            return `
+              <div class="rounded-xl px-3 py-2 border ${item.isMe ? 'bg-amber-950/30 border-amber-400/60' : 'bg-slate-950/80 border-slate-800'} flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="font-black text-amber-300 w-6">${rank}위</span>
+                  <span class="font-bold text-slate-100 truncate">${maskPhoneMiddle(item.maskedName)}</span>
+                  ${item.isMe ? '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">나</span>' : ''}
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="font-black text-emerald-400">${Number(item.score || 0).toLocaleString()}점</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (e) {
+          listEl.innerHTML = '<div class="text-center py-4 text-xs text-slate-500">랭킹 서버 연결 대기 중...</div>';
+        }
+      }
+
+      function updateHeaderUI() {
+        document.getElementById('highScoreDisplay').textContent = state.highScore.toLocaleString();
+        document.getElementById('vipHeaderBtnLabel').textContent = state.isVip ? 'VIP 적용중' : 'VIP';
+
+        const badge = document.getElementById('userBadge');
+        const loginBtn = document.getElementById('serverSaveGoldBtn');
+        const outBtn = document.getElementById('logoutBtn');
+        if (authToken && currentUsername) {
+          badge.textContent = `📱 ${maskPhoneMiddle(currentUsername)}`;
+          badge.className = 'px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300 shrink-0';
+          loginBtn.classList.add('hidden');
+          outBtn.classList.remove('hidden');
+        } else {
+          badge.textContent = '👤 게스트';
+          badge.className = 'px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-slate-800 border border-slate-700 text-slate-300 shrink-0';
+          loginBtn.classList.remove('hidden');
+          outBtn.classList.add('hidden');
+        }
+      }
+
+      function handleLogout(expired = false) {
+        authToken = null;
+        currentUsername = null;
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+        updateHeaderUI();
+        fetchRanking();
+        showToast(expired ? '로그인이 만료되었습니다.' : '로그아웃되었습니다.');
+      }
+
+      document.getElementById('startActionBtn').addEventListener('click', startGame);
+      document.getElementById('overlayStartBtn').addEventListener('click', startGame);
+      document.getElementById('refreshRankingBtn').addEventListener('click', () => { fetchRanking(); showToast('🏆 랭킹을 갱신했습니다.'); });
+
+      document.getElementById('bgmToggleBtn').addEventListener('click', () => {
+        state.bgmEnabled = !state.bgmEnabled;
+        saveState(false);
+        document.getElementById('bgmToggleBtn').textContent = state.bgmEnabled ? '🎵 배경음 ON' : '🔇 배경음 OFF';
+        if (state.bgmEnabled && running) startBGM(); else stopBGM();
+      });
+      document.getElementById('soundToggleBtn').addEventListener('click', () => {
+        state.soundEnabled = !state.soundEnabled;
+        saveState(false);
+        document.getElementById('soundToggleBtn').textContent = state.soundEnabled ? '🔊 효과음 ON' : '🔇 효과음 OFF';
+      });
+
+      const authModal = document.getElementById('authModal');
+      const phoneInput = document.getElementById('authPhoneDigits');
+      const pinInput = document.getElementById('authPinCode');
+      document.getElementById('serverSaveGoldBtn').addEventListener('click', () => {
+        if (authToken) syncSaveToServer(true);
+        else { authModal.classList.remove('hidden'); authModal.classList.add('flex'); phoneInput.focus(); }
+      });
+      document.getElementById('authCloseBtn').addEventListener('click', () => { authModal.classList.add('hidden'); authModal.classList.remove('flex'); });
+      document.getElementById('logoutBtn').addEventListener('click', () => handleLogout(false));
+      document.getElementById('modeLoginBtn').addEventListener('click', () => {
+        isRegisterMode = false;
+        document.getElementById('modeLoginBtn').className = 'flex-1 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 cursor-pointer';
+        document.getElementById('modeRegisterBtn').className = 'flex-1 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 cursor-pointer';
+      });
+      document.getElementById('modeRegisterBtn').addEventListener('click', () => {
+        isRegisterMode = true;
+        document.getElementById('modeRegisterBtn').className = 'flex-1 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 cursor-pointer';
+        document.getElementById('modeLoginBtn').className = 'flex-1 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 cursor-pointer';
+      });
+      phoneInput.addEventListener('input', (e) => {
+        const d = e.target.value.replace(/\D/g, '').slice(0, 8);
+        e.target.value = d.length > 4 ? `${d.slice(0, 4)}-${d.slice(4)}` : d;
+      });
+      pinInput.addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); });
+
+      document.getElementById('authForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('authErrorMsg');
+        errEl.classList.add('hidden');
+        const digits = phoneInput.value.replace(/\D/g, '');
+        const pin = pinInput.value.trim();
+        if (digits.length !== 8 || !/^\d{4}$/.test(pin)) {
+          errEl.textContent = '휴대폰 번호 8자리와 숫자 비밀번호 4자리를 확인해 주세요.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        const fullId = `010-${digits.slice(0, 4)}-${digits.slice(4)}`;
+        try {
+          const res = await fetch(`${API_BASE_URL}${isRegisterMode ? '/api/register' : '/api/login'}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: fullId, password: pin, gameId: GAME_ID, initialSaveData: state })
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            errEl.textContent = data.error || '처리 중 오류가 발생했습니다.';
+            errEl.classList.remove('hidden');
+            return;
+          }
+          authToken = data.token;
+          currentUsername = data.username;
+          localStorage.setItem(TOKEN_KEY, authToken);
+          localStorage.setItem(USER_KEY, currentUsername);
+          if (data.isVip) state.isVip = true;
+          await loadFromServer();
+          await syncSaveToServer(false);
+          updateHeaderUI();
+          authModal.classList.add('hidden');
+          authModal.classList.remove('flex');
+          pinInput.value = '';
+          showToast(`🟨 [${maskPhoneMiddle(currentUsername)}] 연동 완료!`);
+        } catch (err) {
+          errEl.textContent = '클라우드 서버와 연결할 수 없습니다.';
+          errEl.classList.remove('hidden');
+        }
+      });
+
+      const vipModal = document.getElementById('vipModal');
+      let tossWidgets = null;
+      document.getElementById('vipOpenBtn').addEventListener('click', async () => {
+        vipModal.classList.remove('hidden');
+        vipModal.classList.add('flex');
+        if (tossWidgets || typeof TossPayments === 'undefined') return;
+        try {
+          const tp = TossPayments(TOSS_CLIENT_KEY);
+          tossWidgets = tp.widgets({ customerKey: TossPayments.ANONYMOUS });
+          await tossWidgets.setAmount({ currency: 'KRW', value: VIP_PRICE });
+          await Promise.all([
+            tossWidgets.renderPaymentMethods({ selector: '#toss-payment-method', variantKey: 'DEFAULT' }),
+            tossWidgets.renderAgreement({ selector: '#toss-agreement', variantKey: 'AGREEMENT' })
+          ]);
+          document.getElementById('tossWidgetLoading').classList.add('hidden');
+          document.getElementById('vipPaySubmitBtn').disabled = false;
+        } catch (e) {}
+      });
+      document.getElementById('vipCloseBtn').addEventListener('click', () => { vipModal.classList.add('hidden'); vipModal.classList.remove('flex'); });
+      document.getElementById('vipPaySubmitBtn').addEventListener('click', async () => {
+        if (!tossWidgets) return;
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
+        await tossWidgets.requestPayment({
+          orderId: 'RESCUE_MOM_VIP_' + Date.now(),
+          orderName: '엄마 구하기 VIP 패키지',
+          successUrl: baseUrl + '/payment-success.html',
+          failUrl: baseUrl + '/payment-fail.html',
+          customerName: currentUsername || '게스트'
+        });
+      });
+
+      const resetModal = document.getElementById('resetModal');
+      document.getElementById('resetOpenBtn').addEventListener('click', () => { resetModal.classList.remove('hidden'); resetModal.classList.add('flex'); });
+      document.getElementById('resetCancelBtn').addEventListener('click', () => { resetModal.classList.add('hidden'); resetModal.classList.remove('flex'); });
+      document.getElementById('resetConfirmBtn').addEventListener('click', () => {
+        state.highScore = 0; state.bestSector = 1;
+        saveState(true);
+        updateHeaderUI();
+        resetModal.classList.add('hidden'); resetModal.classList.remove('flex');
+        showToast('🔄 기록이 초기화되었습니다.');
+      });
+
+      let deferredInstall = null;
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; });
+      if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+      document.getElementById('androidInstallBtn').addEventListener('click', async () => {
+        if (deferredInstall) {
+          deferredInstall.prompt();
+          await deferredInstall.userChoice;
+          deferredInstall = null;
+          document.getElementById('androidInstallBtnText').textContent = '설치 완료';
+          return;
+        }
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          showToast('📲 브라우저 메뉴(⋮) → [홈 화면에 추가]를 눌러주세요!');
+        } else {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob(['[InternetShortcut]\r\nURL=' + location.href + '\r\n'], { type: 'text/plain' }));
+          a.download = '엄마구하기.url';
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+          document.getElementById('androidInstallBtnText').textContent = '완료';
+        }
+      });
+
+      resizeCanvas();
+      PLATFORMS = buildStagePlatforms(1);
+      updateHeaderUI();
+      updateHud();
+      if (authToken) loadFromServer();
+      fetchRanking();
+      requestAnimationFrame(mainLoop);
+    })();
+  </script>
+</body>
+</html>
