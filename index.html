@@ -217,9 +217,6 @@
           <button id="soundToggleBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition active:scale-95 cursor-pointer">
             🔊 효과음 ON
           </button>
-          <button id="resetOpenBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-rose-950/70 hover:text-rose-300 border border-slate-700 hover:border-rose-700/60 text-slate-300 transition active:scale-95 cursor-pointer">
-            초기화
-          </button>
         </div>
       </div>
     </div>
@@ -227,14 +224,15 @@
 
   <!-- Main Content -->
   <main class="flex-1 max-w-5xl w-full mx-auto px-2.5 sm:px-4 py-3 sm:py-4 flex flex-col gap-3">
-    <!-- 상단 작전 개시 버튼 바 -->
+    <!-- 상단 스테이지 & 전체화면 버튼 바 -->
     <section class="bg-slate-900/90 border border-amber-500/35 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
       <div>
         <div class="text-[10px] text-amber-300/90 font-bold">🛸 외계인 침공 2D 액션</div>
         <div id="waveDisplay" class="text-xs sm:text-sm font-extrabold text-emerald-300 mt-0.5">STAGE 1 · 학교 교실</div>
       </div>
-      <button id="startActionBtn" type="button" class="px-4 py-2 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 cursor-pointer active:scale-95 transition shadow">
-        작전 개시
+      <button id="fullscreenBtn" type="button" title="전체화면 전환"
+        class="px-4 py-2 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 cursor-pointer active:scale-95 transition shadow">
+        ⛶ 전체화면
       </button>
     </section>
 
@@ -243,12 +241,6 @@
     <section id="gameAreaSection" class="relative bg-slate-950 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl shadow-black/60">
       <div id="canvasWrapper" class="relative w-full aspect-[4/3] sm:aspect-[16/9] min-h-[340px] max-h-[620px] bg-slate-900 cursor-crosshair">
         <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
-
-        <!-- 우측 상단 전체화면 버튼 -->
-        <button id="fullscreenBtn" type="button" title="전체화면 전환"
-          class="absolute top-2.5 right-2.5 z-10 px-2.5 py-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-900 border border-amber-400/50 text-amber-300 text-[11px] font-black shadow-lg backdrop-blur-sm active:scale-95 transition cursor-pointer">
-          ⛶ 전체화면
-        </button>
 
         <!-- 시작 / 게임오버 / 클리어 오버레이 -->
         <div id="gameOverlay" class="absolute inset-0 z-20 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center">
@@ -407,18 +399,6 @@
         <div id="authErrorMsg" class="hidden text-xs text-rose-400 font-semibold bg-rose-950/40 border border-rose-800/50 rounded-lg px-3 py-2"></div>
         <button id="authSubmitBtn" type="submit" class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-black bg-amber-500 hover:bg-amber-400 text-slate-950 shadow cursor-pointer">로그인 및 서버저장 연동</button>
       </form>
-    </div>
-  </div>
-
-  <!-- 초기화 모달 -->
-  <div id="resetModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
-      <h2 class="text-base font-extrabold text-slate-100 mb-1.5">게임 초기화</h2>
-      <p class="text-xs text-slate-400 mb-4">로컬 최고 기록을 초기화하고 처음부터 다시 시작할까요?</p>
-      <div class="flex justify-end gap-2">
-        <button id="resetCancelBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 cursor-pointer">취소</button>
-        <button id="resetConfirmBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white cursor-pointer">초기화하기</button>
-      </div>
     </div>
   </div>
 
@@ -622,7 +602,7 @@
             osc.frequency.setValueAtTime(riff[bgmStep % riff.length], now);
             g.gain.setValueAtTime(0.024, now);
             g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
-            osc.connect(g); g.connect(audioCtx.destination);
+            osc.connect(g); g.connect(ctxA.destination);
             osc.start(now); osc.stop(now + 0.24);
             bgmStep++;
           } catch (e) {}
@@ -889,7 +869,6 @@
         resetMatch();
         running = true;
         document.getElementById('gameOverlay').classList.add('hidden');
-        document.getElementById('startActionBtn').textContent = '작전 재시작';
         if (state.bgmEnabled) startBGM();
       }
 
@@ -2672,7 +2651,6 @@
         showToast(expired ? '로그인이 만료되었습니다.' : '로그아웃되었습니다.');
       }
 
-      document.getElementById('startActionBtn').addEventListener('click', startGame);
       document.getElementById('overlayStartBtn').addEventListener('click', startGame);
       document.getElementById('refreshRankingBtn').addEventListener('click', () => { fetchRanking(); showToast('🏆 랭킹을 갱신했습니다.'); });
 
@@ -2784,17 +2762,6 @@
           failUrl: baseUrl + '/payment-fail.html',
           customerName: currentUsername || '게스트'
         });
-      });
-
-      const resetModal = document.getElementById('resetModal');
-      document.getElementById('resetOpenBtn').addEventListener('click', () => { resetModal.classList.remove('hidden'); resetModal.classList.add('flex'); });
-      document.getElementById('resetCancelBtn').addEventListener('click', () => { resetModal.classList.add('hidden'); resetModal.classList.remove('flex'); });
-      document.getElementById('resetConfirmBtn').addEventListener('click', () => {
-        state.highScore = 0; state.bestSector = 1;
-        saveState(true);
-        updateHeaderUI();
-        resetModal.classList.add('hidden'); resetModal.classList.remove('flex');
-        showToast('🔄 기록이 초기화되었습니다.');
       });
 
       let deferredInstall = null;
